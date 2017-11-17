@@ -8,14 +8,13 @@ RUN apt-get install -y nodejs
 
 RUN mkdir -p /web
 COPY . /web
-RUN rm -rf /web/node_modules/
-WORKDIR /web
+RUN rm -rf /node_modules/
 RUN npm install
 RUN npm run build:dev
 
 # COPY ./nginx-config/signal.conf /etc/nginx/conf.d/signal.conf
 # COPY ./nginx-config/signal-tls.conf /
-RUN cp -r /web/public/* /usr/share/nginx/html/
+RUN cp -r /public/* /usr/share/nginx/html/
 
 # COPY ./nginx-config/start.sh /
 # COPY dhparams.pem /etc/ssl/private/

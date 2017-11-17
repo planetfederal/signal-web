@@ -1,0 +1,15 @@
+version: '2'
+services:
+  nginx:
+    image: jwilder/nginx-proxy
+    ports:
+      - '80:80'
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  signal-web:
+    build: .
+    ports:
+      - '8080:80'
+    environment:
+      - VIRTUAL_HOST=signal-web
+      - DOMAIN_NAME=signal-web
