@@ -1,54 +1,69 @@
-import * as request from 'superagent-bluebird-promise';
-import keyBy from 'lodash/keyBy';
-import omit from 'lodash/omit';
-import { push } from 'react-router-redux';
-import { API_URL } from 'config';
+import * as request from "superagent-bluebird-promise";
+import keyBy from "lodash/keyBy";
+import omit from "lodash/omit";
+import { push } from "react-router-redux";
+import { API_URL } from "config";
 
-export const LOAD_SPATIAL_PROCESSORS = 'sc/processors/LOAD_SPATIAL_PROCESSORS';
-export const ADD_PROCESSOR = 'sc/processors/ADD_PROCESSOR';
-export const UPDATE_PROCESSOR = 'sc/processors/UPDATE_PROCESSOR';
-export const DELETE_PROCESSOR = 'sc/processors/DELETE_PROCESSOR';
-export const PROCESSOR_ERRORS = 'sc/processors/PROCESSOR_ERRORS';
+export const LOAD_SPATIAL_PROCESSORS = "sc/processors/LOAD_SPATIAL_PROCESSORS";
+export const ADD_PROCESSOR = "sc/processors/ADD_PROCESSOR";
+export const UPDATE_PROCESSOR = "sc/processors/UPDATE_PROCESSOR";
+export const DELETE_PROCESSOR = "sc/processors/DELETE_PROCESSOR";
+export const PROCESSOR_ERRORS = "sc/processors/PROCESSOR_ERRORS";
+export const LOAD_CAPABILITIES = "sc/capabilities/LOAD_CAPABILITIES";
 
 const initialState = {
   spatial_processors: {},
   errors: {},
+  capabilities: {
+    inputs: {},
+    outputs: {},
+    predicates: {}
+  }
 };
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
+    case LOAD_CAPABILITIES:
+      return {
+        ...state,
+        capabilities: action.payload.capabilities
+      };
     case LOAD_SPATIAL_PROCESSORS:
       return {
         ...state,
-        spatial_processors: action.payload.spatial_processors,
+        spatial_processors: action.payload.spatial_processors
       };
     case ADD_PROCESSOR:
       return {
         ...state,
         spatial_processors: {
           ...state.spatial_processors,
-          [action.payload.processor.id]: action.payload.processor,
-        },
+          [action.payload.processor.id]: action.payload.processor
+        }
       };
     case UPDATE_PROCESSOR:
       return {
         ...state,
         spatial_processors: {
           ...state.spatial_processors,
-          [action.payload.processor.id]: action.payload.processor,
-        },
+          [action.payload.processor.id]: action.payload.processor
+        }
       };
     case DELETE_PROCESSOR:
       return {
         ...state,
-        spatial_processors: omit(state.spatial_processors, action.payload.processor.id),
+        spatial_processors: omit(
+          state.spatial_processors,
+          action.payload.processor.id
+        )
       };
     case PROCESSOR_ERRORS:
       return {
         ...state,
-        errors: action.payload.errors,
+        errors: action.payload.errors
       };
-    default: return state;
+    default:
+      return state;
   }
 }
 
@@ -56,8 +71,8 @@ export function updateProcessorErrors(errors) {
   return {
     type: PROCESSOR_ERRORS,
     payload: {
-      errors,
-    },
+      errors
+    }
   };
 }
 
@@ -67,11 +82,11 @@ export function updateProcessor(processor) {
     const token = sc.auth.token;
     return request
       .put(`${API_URL}processors/${processor.id}`)
-      .set('Authorization', `Token ${token}`)
+      .set("Authorization", `Token ${token}`)
       .send(processor)
       .then(
         () => dispatch(loadProcessor(processor.id, true)),
-        err => dispatch(updateProcessorErrors(err.body.error)),
+        err => dispatch(updateProcessorErrors(err.body.error))
       );
   };
 }
@@ -82,11 +97,11 @@ export function addProcessor(processor) {
     const token = sc.auth.token;
     return request
       .post(`${API_URL}processors`)
-      .set('Authorization', `Token ${token}`)
+      .set("Authorization", `Token ${token}`)
       .send(processor)
       .then(
         () => dispatch(loadProcessors()),
-        err => dispatch(updateProcessorErrors(err.body.error)),
+        err => dispatch(updateProcessorErrors(err.body.error))
       );
   };
 }
@@ -95,15 +110,15 @@ export function receiveProcessors(processors) {
   return {
     type: LOAD_SPATIAL_PROCESSORS,
     payload: {
-      spatial_processors: keyBy(processors, 'id'),
-    },
+      spatial_processors: keyBy(processors, "id")
+    }
   };
 }
 
 export function receiveProcessor(processor) {
   return {
     type: ADD_PROCESSOR,
-    payload: { processor },
+    payload: { processor }
   };
 }
 
@@ -113,17 +128,16 @@ export function deleteProcessor(processor) {
     const token = sc.auth.token;
     return request
       .delete(`${API_URL}processors/${processor.id}`)
-      .set('Authorization', `Token ${token}`)
+      .set("Authorization", `Token ${token}`)
       .then(() => {
         dispatch({
           type: DELETE_PROCESSOR,
-          payload: { processor },
+          payload: { processor }
         });
-        dispatch(push('/processors'));
+        dispatch(push("/processors"));
       });
   };
 }
-
 
 export function loadProcessor(processorId) {
   return (dispatch, getState) => {
@@ -131,7 +145,7 @@ export function loadProcessor(processorId) {
     const token = sc.auth.token;
     return request
       .get(`${API_URL}processors/${processorId}`)
-      .set('Authorization', `Token ${token}`)
+      .set("Authorization", `Token ${token}`)
       .then(res => res.body.result)
       .then(data => dispatch(receiveProcessor(data)));
   };
@@ -143,8 +157,26 @@ export function loadProcessors() {
     const token = sc.auth.token;
     return request
       .get(`${API_URL}processors`)
-      .set('Authorization', `Token ${token}`)
+      .set("Authorization", `Token ${token}`)
       .then(res => res.body.result)
       .then(data => dispatch(receiveProcessors(data)));
+  };
+}
+
+function receiveCapabilities(capabilities) {
+  return {
+    type: LOAD_CAPABILITIES,
+    payload: {
+      capabilities
+    }
+  };
+}
+
+export function loadCapabilities() {
+  return dispatch => {
+    return request
+      .get(`${API_URL}capabilities`)
+      .then(res => res.body.result)
+      .then(data => dispatch(receiveCapabilities(data)));
   };
 }

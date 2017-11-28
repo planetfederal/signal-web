@@ -1,16 +1,17 @@
-import React, { Component, PropTypes } from 'react';
-import { isEmail } from '../utils';
+import React, { Component, PropTypes } from "react";
+import without from "lodash/without";
+import { isEmail } from "../utils";
 
-export const validate = (values) => {
+export const validate = values => {
   const errors = {};
 
   if (!values.name) {
-    errors.name = 'Required';
+    errors.name = "Required";
   }
 
-  values.recipients.emails.forEach((email) => {
+  values.recipients.emails.forEach(email => {
     if (!isEmail(email)) {
-      errors.email = 'Invalid email address';
+      errors.email = "Invalid email address";
     }
   });
 
@@ -18,7 +19,6 @@ export const validate = (values) => {
 };
 
 export class ProcessorForm extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -26,6 +26,8 @@ export class ProcessorForm extends Component {
       email_recipients: props.processor.recipients.emails || [],
       name: props.processor.name,
       description: props.processor.description,
+      capabilities: props.capabilities,
+      output: props.capabilities.outputs[0]
     };
 
     this.save = this.save.bind(this);
@@ -34,10 +36,23 @@ export class ProcessorForm extends Component {
     this.onEmailChange = this.onEmailChange.bind(this);
     this.onNameChange = this.onNameChange.bind(this);
     this.onDescriptionChange = this.onDescriptionChange.bind(this);
+    this.onOutputChange = this.onOutputChange.bind(this);
   }
 
   onOptionChange(e) {
-    this.setState({ repeated: e.target.value === 'repeat_on' });
+    this.setState({ repeated: e.target.value === "repeat_on" });
+  }
+
+  onSourceChange(e) {
+    if (e.target.checked) {
+      this.setState({
+        sourceStores: this.state.sourceStores.concat(e.target.value)
+      });
+    } else {
+      this.setState({
+        sourceStores: without(this.state.sourceStores, e.target.value)
+      });
+    }
   }
 
   onNameChange(e) {
@@ -46,12 +61,16 @@ export class ProcessorForm extends Component {
 
   onEmailChange(e) {
     this.setState({
-      email_recipients: e.target.value.split('\n'),
+      email_recipients: e.target.value.split("\n")
     });
   }
 
   onDescriptionChange(e) {
     this.setState({ description: e.target.value });
+  }
+
+  onOutputChange(e) {
+    this.setState({ output: e.target.value });
   }
 
   save() {
@@ -62,8 +81,8 @@ export class ProcessorForm extends Component {
       repeated: this.state.repeated,
       recipients: {
         emails: this.state.email_recipients,
-        devices: [],
-      },
+        devices: []
+      }
     };
     const errors = validate(newProcessor);
     this.props.actions.updateProcessorErrors(errors);
@@ -79,28 +98,38 @@ export class ProcessorForm extends Component {
         <div className="form-group">
           <label htmlFor="processor-name">Name:</label>
           <input
-            id="processor-name" type="text" className="form-control"
+            id="processor-name"
+            type="text"
+            className="form-control"
             onChange={this.onNameChange}
             value={this.state.name}
           />
-          {errors.name ? <p className="text-danger">{errors.name}</p> : ''}
+          {errors.name ? <p className="text-danger">{errors.name}</p> : ""}
         </div>
         <div className="form-group">
           <label htmlFor="processor-description">Description:</label>
           <textarea
             id="processor-description"
-            className="form-control" rows="3"
+            className="form-control"
+            rows="3"
             onChange={this.onDescriptionChange}
             value={this.state.description}
           />
-          {errors.description ? <p className="text-danger">{errors.description}</p> : ''}
+          {errors.description ? (
+            <p className="text-danger">{errors.description}</p>
+          ) : (
+            ""
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="store-repeated">Repeated:</label>
           <div className="radio">
             <label htmlFor="repeat_off">
               <input
-                type="radio" name="repeated" id="repeat_off" value="repeat_off"
+                type="radio"
+                name="repeated"
+                id="repeat_off"
+                value="repeat_off"
                 checked={!this.state.repeated}
                 onChange={this.onOptionChange}
               />
@@ -110,7 +139,10 @@ export class ProcessorForm extends Component {
           <div className="radio">
             <label htmlFor="repeat_on">
               <input
-                type="radio" name="repeated" id="repeat_on" value="repeat_on"
+                type="radio"
+                name="repeated"
+                id="repeat_on"
+                value="repeat_on"
                 defaultChecked={this.state.repeated}
                 onChange={this.onOptionChange}
               />
@@ -119,20 +151,46 @@ export class ProcessorForm extends Component {
           </div>
         </div>
         <div className="form-group">
+          <label>Output</label>
+          <select
+            id="store-type"
+            className="form-control"
+            value={this.state.output.type}
+            onChange={this.onOutputChange}
+          >
+            {this.state.capabilities.outputs.map(output => (
+              <option key={output.type} value={output.type}>
+                {output.type}
+              </option>
+            ))}
+          </select>
+          {errors.store_type ? (
+            <p className="text-danger">{errors.store_type}</p>
+          ) : (
+            ""
+          )}
+        </div>
+        <div className="form-group">
           <label htmlFor="recipients">Email Recipients</label>
           <textarea
             id="recipients"
-            className="form-control" rows="3"
+            className="form-control"
+            rows="3"
             onChange={this.onEmailChange}
-            value={this.state.email_recipients.join('\n')}
+            value={this.state.email_recipients.join("\n")}
           />
-          {errors.email ? <p className="text-danger">{errors.email}</p> : ''}
+          {errors.email ? <p className="text-danger">{errors.email}</p> : ""}
         </div>
-        {!!this.props.errors.length &&
-          <p className="text-danger">{this.props.errors}</p>}
+        {!!this.props.errors.length && (
+          <p className="text-danger">{this.props.errors}</p>
+        )}
         <div className="btn-toolbar">
-          <button className="btn btn-sc" onClick={this.save}>Save</button>
-          <button className="btn btn-default" onClick={cancel}>Cancel</button>
+          <button className="btn btn-sc" onClick={this.save}>
+            Save
+          </button>
+          <button className="btn btn-default" onClick={cancel}>
+            Cancel
+          </button>
         </div>
       </div>
     );
@@ -144,7 +202,7 @@ ProcessorForm.propTypes = {
   errors: PropTypes.object.isRequired,
   cancel: PropTypes.func.isRequired,
   actions: PropTypes.object.isRequired,
-  onSave: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired
 };
 
 export default ProcessorForm;
