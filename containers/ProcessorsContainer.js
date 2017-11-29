@@ -5,17 +5,6 @@ import * as processorActions from "../ducks/processors";
 import { ProcessorForm } from "../components/ProcessorForm";
 import ProcessorList from "../components/ProcessorList";
 
-const emptyProcessor = {
-  name: "",
-  description: "",
-  repeated: false,
-  recipients: {
-    devices: [],
-    emails: []
-  },
-  rules: []
-};
-
 class ProcessorsContainer extends Component {
   constructor(props) {
     super(props);
@@ -48,6 +37,15 @@ class ProcessorsContainer extends Component {
 
   render() {
     const { children, capabilities } = this.props;
+    const emptyProcessor = {
+      name: "",
+      description: "",
+      repeated: false,
+      persistent: false,
+      definition: {
+        output: capabilities.outputs[1]
+      }
+    };
     if (children) {
       return <div className="wrapper">{children}</div>;
     }

@@ -1,6 +1,9 @@
 import React, { Component, PropTypes } from "react";
 import without from "lodash/without";
 import { isEmail } from "../utils";
+import WebhookForm from "./output/WebhookForm";
+import EmailForm from "./output/EmailForm";
+import * as R from "ramda";
 
 export const validate = values => {
   const errors = {};
@@ -9,11 +12,9 @@ export const validate = values => {
     errors.name = "Required";
   }
 
-  values.recipients.emails.forEach(email => {
-    if (!isEmail(email)) {
-      errors.email = "Invalid email address";
-    }
-  });
+  if (!values.description) {
+    errors.description = "Required";
+  }
 
   return errors;
 };
@@ -23,46 +24,28 @@ export class ProcessorForm extends Component {
     super(props);
     this.state = {
       repeated: props.processor.repeated,
-      email_recipients: props.processor.recipients.emails || [],
+      persistent: props.processor.persistent,
       name: props.processor.name,
       description: props.processor.description,
       capabilities: props.capabilities,
-      output: props.capabilities.outputs[0]
+      definition: props.processor.definition
     };
 
     this.save = this.save.bind(this);
     this.onOptionChange = this.onOptionChange.bind(this);
-    this.onSourceChange = this.onSourceChange.bind(this);
-    this.onEmailChange = this.onEmailChange.bind(this);
     this.onNameChange = this.onNameChange.bind(this);
     this.onDescriptionChange = this.onDescriptionChange.bind(this);
     this.onOutputChange = this.onOutputChange.bind(this);
+    this.onOutputValueChange = this.onOutputValueChange.bind(this);
+    this.getOutput = this.getOutput.bind(this);
   }
 
   onOptionChange(e) {
     this.setState({ repeated: e.target.value === "repeat_on" });
   }
 
-  onSourceChange(e) {
-    if (e.target.checked) {
-      this.setState({
-        sourceStores: this.state.sourceStores.concat(e.target.value)
-      });
-    } else {
-      this.setState({
-        sourceStores: without(this.state.sourceStores, e.target.value)
-      });
-    }
-  }
-
   onNameChange(e) {
     this.setState({ name: e.target.value });
-  }
-
-  onEmailChange(e) {
-    this.setState({
-      email_recipients: e.target.value.split("\n")
-    });
   }
 
   onDescriptionChange(e) {
@@ -70,7 +53,47 @@ export class ProcessorForm extends Component {
   }
 
   onOutputChange(e) {
-    this.setState({ output: e.target.value });
+    const o = R.find(
+      R.propEq("type", e.target.value),
+      this.props.capabilities.outputs
+    );
+    this.setState({
+      definition: {
+        ...this.state.definition,
+        output: o
+      }
+    });
+  }
+
+  onOutputValueChange(key, e) {
+    const output = R.merge(this.state.definition.output, {
+      [key]: e.target.value
+    });
+    this.setState({
+      definition: {
+        ...this.state.definition,
+        output
+      }
+    });
+  }
+
+  getOutput(outputType) {
+    switch (outputType) {
+      case "email":
+        return (
+          <Email
+            onChange={this.onOutputValueChange}
+            value={this.state.definition.output}
+          />
+        );
+      case "webhook":
+        return (
+          <Webhook
+            onChange={this.onOutputValueChange}
+            value={this.state.definition.output}
+          />
+        );
+    }
   }
 
   save() {
@@ -79,10 +102,8 @@ export class ProcessorForm extends Component {
       name: this.state.name,
       description: this.state.description,
       repeated: this.state.repeated,
-      recipients: {
-        emails: this.state.email_recipients,
-        devices: []
-      }
+      persistent: this.state.persistent,
+      definition: this.state.definition
     };
     const errors = validate(newProcessor);
     this.props.actions.updateProcessorErrors(errors);
@@ -155,7 +176,7 @@ export class ProcessorForm extends Component {
           <select
             id="store-type"
             className="form-control"
-            value={this.state.output.type}
+            value={this.state.definition.output.type}
             onChange={this.onOutputChange}
           >
             {this.state.capabilities.outputs.map(output => (
@@ -164,23 +185,14 @@ export class ProcessorForm extends Component {
               </option>
             ))}
           </select>
+          {this.getOutput(this.state.definition.output.type)}
           {errors.store_type ? (
             <p className="text-danger">{errors.store_type}</p>
           ) : (
             ""
           )}
         </div>
-        <div className="form-group">
-          <label htmlFor="recipients">Email Recipients</label>
-          <textarea
-            id="recipients"
-            className="form-control"
-            rows="3"
-            onChange={this.onEmailChange}
-            value={this.state.email_recipients.join("\n")}
-          />
-          {errors.email ? <p className="text-danger">{errors.email}</p> : ""}
-        </div>
+
         {!!this.props.errors.length && (
           <p className="text-danger">{this.props.errors}</p>
         )}

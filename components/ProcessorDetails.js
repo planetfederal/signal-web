@@ -1,32 +1,32 @@
-import React, { Component, PropTypes } from 'react';
-import Dropzone from 'react-dropzone';
-import isEqual from 'lodash/isEqual';
-import isEmpty from 'lodash/isEmpty';
-import ProcessorItem from './ProcessorItem';
-import { ProcessorForm } from './ProcessorForm';
-import PropertyListItem from './PropertyListItem';
-import '../style/Processors.less';
+import React, { Component, PropTypes } from "react";
+import Dropzone from "react-dropzone";
+import isEqual from "lodash/isEqual";
+import isEmpty from "lodash/isEmpty";
+import ProcessorItem from "./ProcessorItem";
+import { ProcessorForm } from "./ProcessorForm";
+import PropertyListItem from "./PropertyListItem";
+import "../style/Processors.less";
 
 const format = new ol.format.GeoJSON();
 
 const processorStyle = new ol.style.Style({
   fill: new ol.style.Fill({
-    color: 'rgba(255, 0, 0, 0.1)',
+    color: "rgba(255, 0, 0, 0.1)"
   }),
   stroke: new ol.style.Stroke({
-    color: '#f00',
-    width: 1,
-  }),
+    color: "#f00",
+    width: 1
+  })
 });
 
 const newRuleStyle = new ol.style.Style({
   fill: new ol.style.Fill({
-    color: 'rgba(0, 0, 255, 0.1)',
+    color: "rgba(0, 0, 255, 0.1)"
   }),
   stroke: new ol.style.Stroke({
-    color: '#00f',
-    width: 1,
-  }),
+    color: "#00f",
+    width: 1
+  })
 });
 
 class ProcessorDetails extends Component {
@@ -43,8 +43,8 @@ class ProcessorDetails extends Component {
       fileUploaded: false,
       uploadedFile: false,
       uploadErr: false,
-      rule_comparator: '$geowithin',
-      activeRules: {},
+      rule_comparator: "$geowithin",
+      activeRules: {}
     };
     this.ruleLayers = {};
     this.onSave = this.onSave.bind(this);
@@ -65,7 +65,7 @@ class ProcessorDetails extends Component {
 
   componentDidMount() {
     this.createMap();
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       this.createMap();
     });
   }
@@ -94,7 +94,7 @@ class ProcessorDetails extends Component {
       uploadErr: false,
       uploadedFile: false,
       editingRule: false,
-      editingProcessor: false,
+      editingProcessor: false
     });
   }
 
@@ -104,34 +104,39 @@ class ProcessorDetails extends Component {
       creating: false,
       drawing: false,
       uploading: false,
-      uploadedFile: false,
+      uploadedFile: false
     });
     this.map.removeInteraction(this.modify);
     this.map.removeInteraction(this.create);
     this.select.getFeatures().clear();
-    const fcId = `${this.props.processor.id}.${this.props.processor.rules.length + 1}`;
+    const fcId = `${this.props.processor.id}.${this.props.processor.rules
+      .length + 1}`;
     const fs = this.newRuleSource.getFeatures().map((f, i) => {
       f.setId(`${fcId}.${i}`);
       return f;
     });
-    const gj = JSON.parse(format.writeFeatures(fs, {
-      dataProjection: 'EPSG:4326',
-      featureProjection: 'EPSG:3857',
-    }));
+    const gj = JSON.parse(
+      format.writeFeatures(fs, {
+        dataProjection: "EPSG:4326",
+        featureProjection: "EPSG:3857"
+      })
+    );
     gj.id = fcId;
     gj.features = gj.features.map(f => ({
       ...f,
-      properties: {},
+      properties: {}
     }));
     const newRule = {
-      lhs: ['geometry'],
+      lhs: ["geometry"],
       comparator: this.state.rule_comparator,
       rhs: gj,
-      id: Date.now(),
+      id: Date.now()
     };
     const newProcessor = {
       ...this.props.processor,
-      rules: this.props.processor.rules ? this.props.processor.rules.concat(newRule) : [newRule],
+      rules: this.props.processor.rules
+        ? this.props.processor.rules.concat(newRule)
+        : [newRule]
     };
     this.newRuleSource.clear();
     this.props.actions.updateProcessor(newProcessor);
@@ -150,21 +155,23 @@ class ProcessorDetails extends Component {
     if (acceptedFiles.length) {
       const file = acceptedFiles[0];
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         try {
           const gj = JSON.parse(e.target.result);
           this.setState({
             uploadErr: false,
-            uploadedFile: file.name,
+            uploadedFile: file.name
           });
           const features = format.readFeatures(gj);
-          features.forEach((feature) => {
-            feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
+          features.forEach(feature => {
+            feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
             this.newRuleSource.addFeature(feature);
           });
-          this.map.getView().fit(this.newRuleSource.getExtent(), this.map.getSize());
+          this.map
+            .getView()
+            .fit(this.newRuleSource.getExtent(), this.map.getSize());
         } catch (err) {
-          this.setState({ uploadErr: 'Not valid GeoJSON' });
+          this.setState({ uploadErr: "Not valid GeoJSON" });
         }
       };
       reader.readAsText(file);
@@ -177,7 +184,7 @@ class ProcessorDetails extends Component {
 
   onRuleComparatorChange(e) {
     this.setState({
-      rule_comparator: e.target.value,
+      rule_comparator: e.target.value
     });
   }
 
@@ -204,7 +211,10 @@ class ProcessorDetails extends Component {
 
   onEditRule(rule) {
     const layer = this.ruleLayers[rule.id];
-    const fs = layer.getSource().getFeatures().map(f => f.clone());
+    const fs = layer
+      .getSource()
+      .getFeatures()
+      .map(f => f.clone());
     this.setState({ editingRule: rule.id });
     this.select.getFeatures().clear();
     this.newRuleSource.clear();
@@ -212,7 +222,7 @@ class ProcessorDetails extends Component {
     this.map.removeLayer(layer);
     this.newRuleSource.addFeatures(fs);
     this.modify = new ol.interaction.Modify({
-      features: new ol.Collection(this.newRuleSource.getFeatures()),
+      features: new ol.Collection(this.newRuleSource.getFeatures())
     });
     this.map.addInteraction(this.modify);
   }
@@ -223,30 +233,32 @@ class ProcessorDetails extends Component {
       f.setId(`${fcId}.${i}`);
       return f;
     });
-    const gj = JSON.parse(format.writeFeatures(fs, {
-      dataProjection: 'EPSG:4326',
-      featureProjection: 'EPSG:3857',
-    }));
+    const gj = JSON.parse(
+      format.writeFeatures(fs, {
+        dataProjection: "EPSG:4326",
+        featureProjection: "EPSG:3857"
+      })
+    );
     gj.id = fcId;
     gj.features = gj.features.map(f => ({
       ...f,
-      properties: {},
+      properties: {}
     }));
     const newRule = {
       ...rule,
-      rhs: gj,
+      rhs: gj
     };
     const newProcessor = {
       ...this.props.processor,
-      rules: this.props.processor.rules.map((r) => {
+      rules: this.props.processor.rules.map(r => {
         if (r.id === newRule.id) {
           return newRule;
         }
         return r;
-      }),
+      })
     };
     this.setState({
-      editingRule: false,
+      editingRule: false
     });
     this.map.removeInteraction(this.modify);
     this.newRuleSource.clear();
@@ -256,7 +268,7 @@ class ProcessorDetails extends Component {
   onDeleteRule(rule) {
     const newProcessor = {
       ...this.props.processor,
-      rules: this.props.processor.rules.filter(r => r.id !== rule.id),
+      rules: this.props.processor.rules.filter(r => r.id !== rule.id)
     };
     this.select.getFeatures().clear();
     this.props.actions.updateProcessor(newProcessor);
@@ -268,7 +280,7 @@ class ProcessorDetails extends Component {
     this.newRuleSource.clear();
     this.map.addLayer(layer);
     this.setState({
-      editingRule: false,
+      editingRule: false
     });
   }
 
@@ -280,32 +292,32 @@ class ProcessorDetails extends Component {
     this.newRuleSource = new ol.source.Vector();
     const newRuleLayer = new ol.layer.Vector({
       source: this.newRuleSource,
-      style: newRuleStyle,
+      style: newRuleStyle
     });
     this.select = new ol.interaction.Select({
       wrapX: false,
-      style: newRuleStyle,
+      style: newRuleStyle
     });
     this.modify = new ol.interaction.Modify({
-      features: new ol.Collection(this.newRuleSource.getFeatures()),
+      features: new ol.Collection(this.newRuleSource.getFeatures())
     });
     this.create = new ol.interaction.Draw({
       source: this.newRuleSource,
-      type: ('Polygon'),
+      type: "Polygon"
     });
     this.map = new ol.Map({
       target: this.mapRef,
       interactions: ol.interaction.defaults().extend([this.select]),
       layers: [
         new ol.layer.Tile({
-          source: new ol.source.OSM(),
+          source: new ol.source.OSM()
         }),
-        newRuleLayer,
+        newRuleLayer
       ],
       view: new ol.View({
         center: ol.proj.fromLonLat([-100, 30]),
-        zoom: 3,
-      }),
+        zoom: 3
+      })
     });
 
     this.addRules(this.props.processor);
@@ -313,15 +325,18 @@ class ProcessorDetails extends Component {
 
   addRules(processor) {
     Object.keys(this.ruleLayers).forEach(layerid =>
-      this.map.removeLayer(this.ruleLayers[layerid]));
+      this.map.removeLayer(this.ruleLayers[layerid])
+    );
     this.ruleLayers = {};
     if (processor.rules && processor.rules.length) {
-      processor.rules.forEach((rule) => {
-        if (rule.comparator === '$geowithin') {
+      processor.rules.forEach(rule => {
+        if (rule.comparator === "$geowithin") {
           this.addRule(rule);
         }
       });
-      this.map.getView().fit(this.allRuleSource.getExtent(), this.map.getSize());
+      this.map
+        .getView()
+        .fit(this.allRuleSource.getExtent(), this.map.getSize());
     }
   }
 
@@ -329,22 +344,22 @@ class ProcessorDetails extends Component {
     if (isEmpty(rule.rhs)) return;
     const ruleSource = new ol.source.Vector();
     const features = format.readFeatures(rule.rhs);
-    features.forEach((feature) => {
-      feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
+    features.forEach(feature => {
+      feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
       ruleSource.addFeature(feature);
       this.allRuleSource.addFeature(feature);
     });
     const layer = new ol.layer.Vector({
       source: ruleSource,
-      style: processorStyle,
+      style: processorStyle
     });
     this.ruleLayers[rule.id] = layer;
     this.map.addLayer(layer);
     this.setState(prevState => ({
       activeRules: {
         ...prevState.activeRules,
-        [rule.id]: true,
-      },
+        [rule.id]: true
+      }
     }));
   }
 
@@ -360,8 +375,8 @@ class ProcessorDetails extends Component {
       this.setState(prevState => ({
         activeRules: {
           ...prevState.activeRules,
-          [rule.id]: !active,
-        },
+          [rule.id]: !active
+        }
       }));
     }
   }
@@ -377,99 +392,160 @@ class ProcessorDetails extends Component {
   }
 
   renderRules() {
-    const ruleList = this.props.processor.rules.length === 0 ?
-      <span className="note">No rules have been added to this processor.</span> :
-      this.props.processor.rules.map(rule => (
-        <div className="form-item mini">
-          <div className="properties">
-            <PropertyListItem name={'Type'} value={rule.comparator.replace('$', '')} />
-          </div>
-          {this.state.editingRule === rule.id ?
-            <div className="btn-toolbar plain">
-              <span className="btn-plain" onClick={() => this.onSaveRule(rule)}>Save</span>
-              <span className="btn-plain" onClick={() => this.onCancelRule(rule)}>
-                Cancel
-              </span>
-            </div> :
-            <div className="btn-toolbar plain">
-              <span className="btn-plain" onClick={() => this.viewRule(rule)}>View</span>
-              <span className="btn-plain" onClick={() => this.onEditRule(rule)}>Edit</span>
-              <span className="btn-plain" onClick={() => this.onDeleteRule(rule)}>
-                Delete
-              </span>
+    const ruleList =
+      this.props.processor.definition.predicates.length === 0 ? (
+        <span className="note">
+          No rules have been added to this processor.
+        </span>
+      ) : (
+        this.props.processor.rules.map(rule => (
+          <div className="form-item mini">
+            <div className="properties">
+              <PropertyListItem
+                name={"Type"}
+                value={rule.comparator.replace("$", "")}
+              />
             </div>
-          }
-        </div>
-      ));
-    return (<div>
-      <h4>Rules</h4>
-      <div className="rule-list">
-        {ruleList}
+            {this.state.editingRule === rule.id ? (
+              <div className="btn-toolbar plain">
+                <span
+                  className="btn-plain"
+                  onClick={() => this.onSaveRule(rule)}
+                >
+                  Save
+                </span>
+                <span
+                  className="btn-plain"
+                  onClick={() => this.onCancelRule(rule)}
+                >
+                  Cancel
+                </span>
+              </div>
+            ) : (
+              <div className="btn-toolbar plain">
+                <span className="btn-plain" onClick={() => this.viewRule(rule)}>
+                  View
+                </span>
+                <span
+                  className="btn-plain"
+                  onClick={() => this.onEditRule(rule)}
+                >
+                  Edit
+                </span>
+                <span
+                  className="btn-plain"
+                  onClick={() => this.onDeleteRule(rule)}
+                >
+                  Delete
+                </span>
+              </div>
+            )}
+          </div>
+        ))
+      );
+    return (
+      <div>
+        <h4>Rules</h4>
+        <div className="rule-list">{ruleList}</div>
+        {!this.state.creating && (
+          <div className="btn-toolbar">
+            <button className="btn btn-sc" onClick={this.onAddRule}>
+              Add Rule
+            </button>
+          </div>
+        )}
       </div>
-      {!this.state.creating &&
-      <div className="btn-toolbar">
-        <button className="btn btn-sc" onClick={this.onAddRule}>Add Rule</button>
-      </div>}
-    </div>);
+    );
   }
 
   renderEditing() {
     return (
       <div>
         <div className="btn-toolbar">
-          <button className="btn btn-sc" onClick={this.onEditProcessor}>Edit Processor</button>
-          <button className="btn btn-danger" onClick={this.onDelete}>Delete</button>
+          <button className="btn btn-sc" onClick={this.onEditProcessor}>
+            Edit Processor
+          </button>
+          <button className="btn btn-danger" onClick={this.onDelete}>
+            Delete
+          </button>
         </div>
-      </div>);
+      </div>
+    );
   }
 
   renderCreating() {
-    const uploading = this.state.uploadedFile ? <span>{this.state.uploadedFile}</span> :
-      (<div>
+    const uploading = this.state.uploadedFile ? (
+      <span>{this.state.uploadedFile}</span>
+    ) : (
+      <div>
         <Dropzone
-          onDrop={this.onDrop} multiple={false}
-          className="drop-zone" activeClassName="drop-zone-active"
+          onDrop={this.onDrop}
+          multiple={false}
+          className="drop-zone"
+          activeClassName="drop-zone-active"
         >
           <div>
             <span>Drop file here, or click to select file to upload.</span>
-            <br /><br />
+            <br />
+            <br />
             <span>GeoJSON files accepted.</span>
           </div>
         </Dropzone>
-        {!!this.state.uploadErr &&
-          <p>{this.state.uploadErr}</p>
-        }
-      </div>);
-    const done = (<div className="btn-toolbar">
-      <button className="btn btn-sc" onClick={this.onSave}>Save</button>
-      <button className="btn btn-sc" onClick={this.onCancel}>Cancel</button>
-    </div>);
+        {!!this.state.uploadErr && <p>{this.state.uploadErr}</p>}
+      </div>
+    );
+    const done = (
+      <div className="btn-toolbar">
+        <button className="btn btn-sc" onClick={this.onSave}>
+          Save
+        </button>
+        <button className="btn btn-sc" onClick={this.onCancel}>
+          Cancel
+        </button>
+      </div>
+    );
     if (this.state.creating) {
-      return (<div className="add-rule">
-        <h4>Add Rule</h4>
-        <div className="form-group">
-          <label htmlFor="comparator" >Rule Type:</label>
-          <select
-            id="comparator" className="form-control"
-            value={this.state.rule_comparator}
-            onChange={this.onRuleComparatorChange}
-          >
-            <option value="$geowithin">geowithin</option>
-          </select>
+      return (
+        <div className="add-rule">
+          <h4>Add Rule</h4>
+          <div className="form-group">
+            <label htmlFor="comparator">Rule Type:</label>
+            <select
+              id="comparator"
+              className="form-control"
+              value={this.state.rule_comparator}
+              onChange={this.onRuleComparatorChange}
+            >
+              <option value="$geowithin">geowithin</option>
+            </select>
+          </div>
+          {this.state.drawing && done}
+          {this.state.uploading && (
+            <div>
+              {uploading}
+              {done}
+            </div>
+          )}
+          {!this.state.drawing &&
+            !this.state.uploading && (
+              <div>
+                <div className="btn-toolbar">
+                  <button className="btn btn-sc" onClick={this.onDraw}>
+                    Draw
+                  </button>
+                  <button className="btn btn-sc" onClick={this.onUpload}>
+                    Upload
+                  </button>
+                </div>
+                <div className="btn-toolbar">
+                  <button className="btn btn-default" onClick={this.onCancel}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
-        {this.state.drawing && done}
-        {this.state.uploading && <div>{uploading}{done}</div>}
-        {!this.state.drawing && !this.state.uploading &&
-        <div>
-          <div className="btn-toolbar">
-            <button className="btn btn-sc" onClick={this.onDraw}>Draw</button>
-            <button className="btn btn-sc" onClick={this.onUpload}>Upload</button>
-          </div>
-          <div className="btn-toolbar">
-            <button className="btn btn-default" onClick={this.onCancel}>Cancel</button>
-          </div>
-          </div>}
-      </div>);
+      );
     }
     return null;
   }
@@ -499,7 +575,12 @@ class ProcessorDetails extends Component {
           {this.renderRules()}
           {this.renderCreating()}
         </div>
-        <div className="processor-map" ref={(c) => { this.mapRef = c; }} />
+        <div
+          className="processor-map"
+          ref={c => {
+            this.mapRef = c;
+          }}
+        />
       </div>
     );
   }
@@ -509,7 +590,7 @@ ProcessorDetails.propTypes = {
   processor: PropTypes.object.isRequired,
   menu: PropTypes.object.isRequired,
   actions: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
 };
 
 export default ProcessorDetails;

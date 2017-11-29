@@ -19,6 +19,7 @@ import HomeContainer from "./containers/HomeContainer";
 import ProcessorsContainer from "./containers/ProcessorsContainer";
 import ProcessorDetailsContainer from "./containers/ProcessorDetailsContainer";
 import NotificationContainer from "./containers/NotificationContainer";
+import TestContainer from "./containers/TestContainer";
 
 import "./style/Globals.less";
 
@@ -78,6 +79,11 @@ render(
           path="/notifications/:id"
           staticName
           component={requireAuthentication(NotificationContainer)}
+        />
+        <Route
+          path="/test"
+          name="Test"
+          component={requireAuthentication(TestContainer)}
         />
       </Route>
     </Router>
