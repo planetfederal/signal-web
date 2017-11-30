@@ -81,14 +81,14 @@ export class ProcessorForm extends Component {
     switch (outputType) {
       case "email":
         return (
-          <Email
+          <EmailForm
             onChange={this.onOutputValueChange}
             value={this.state.definition.output}
           />
         );
       case "webhook":
         return (
-          <Webhook
+          <WebhookForm
             onChange={this.onOutputValueChange}
             value={this.state.definition.output}
           />

@@ -1,10 +1,11 @@
-import * as request from 'superagent-bluebird-promise';
-import { API_URL } from 'config';
+import * as request from "superagent-bluebird-promise";
+import { API_URL } from "config";
 
-export const LOAD_NOTIFICATION = 'sc/processors/LOAD_NOTIFICATION';
+export const LOAD_NOTIFICATION = "sc/processors/LOAD_NOTIFICATION";
+export const LOAD_NOTIFICATIONS = "sc/processors/LOAD_NOTIFICATIONS";
 
 const initialState = {
-  notifications: {},
+  notifications: []
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -12,20 +13,38 @@ export default function reducer(state = initialState, action = {}) {
     case LOAD_NOTIFICATION:
       return {
         ...state,
-        notifications: {
-          ...state.notifications,
-          [action.payload.notification.id]: action.payload.notification,
-        },
+        notifications: state.notifications.concat(action.payload.notification)
       };
-    default: return state;
+    case LOAD_NOTIFICATIONS:
+      return {
+        ...state,
+        notifications: action.payload.notifications
+      };
+    default:
+      return state;
   }
+}
+
+export function receiveNotifications(notifications) {
+  return {
+    type: LOAD_NOTIFICATIONS,
+    payload: { notifications }
+  };
 }
 
 export function receiveNotification(notification) {
   return {
     type: LOAD_NOTIFICATION,
-    payload: { notification },
+    payload: { notification }
   };
+}
+
+export function loadNotifications() {
+  return dispatch =>
+    request
+      .get(`${API_URL}notifications`)
+      .then(res => res.body.result)
+      .then(data => dispatch(receiveNotifications(data)));
 }
 
 export function loadNotification(notificationId) {
@@ -34,7 +53,7 @@ export function loadNotification(notificationId) {
     const token = sc.auth.token;
     return request
       .get(`${API_URL}notifications/${notificationId}`)
-      .set('Authorization', `Token ${token}`)
+      .set("Authorization", `Token ${token}`)
       .then(res => res.body.result)
       .then(data => dispatch(receiveNotification(data)));
   };

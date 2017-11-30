@@ -43,7 +43,8 @@ class ProcessorsContainer extends Component {
       repeated: false,
       persistent: false,
       definition: {
-        output: capabilities.outputs[1]
+        output: capabilities.outputs[1],
+        predicates: [{ type: "identity" }]
       }
     };
     if (children) {
