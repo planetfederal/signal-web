@@ -11,15 +11,7 @@ class NotificationContainer extends Component {
     super(props);
   }
 
-  componentWillMount() {
-    this.props.notificationActions.loadNotifications();
-  }
-
   render() {
-    const { children } = this.props;
-    if (children) {
-      return <div className="wrapper">{children}</div>;
-    }
     if (this.props.notifications && this.props.notifications.length > 0) {
       return <NotificationList {...this.props} />;
     }

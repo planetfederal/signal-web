@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import * as processorActions from "../ducks/processors";
 import { ProcessorForm } from "../components/ProcessorForm";
 import ProcessorList from "../components/ProcessorList";
+import uuidv4 from "uuid/v4";
 
 class ProcessorsContainer extends Component {
   constructor(props) {
@@ -44,7 +45,12 @@ class ProcessorsContainer extends Component {
       persistent: false,
       definition: {
         output: capabilities.outputs[1],
-        predicates: [{ type: "identity" }]
+        predicates: [
+          {
+            id: uuidv4(),
+            type: "identity"
+          }
+        ]
       }
     };
     if (children) {

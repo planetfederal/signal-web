@@ -23,12 +23,8 @@ export class ProcessorForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      repeated: props.processor.repeated,
-      persistent: props.processor.persistent,
-      name: props.processor.name,
-      description: props.processor.description,
-      capabilities: props.capabilities,
-      definition: props.processor.definition
+      ...props.processor,
+      capabilities: props.capabilities
     };
 
     this.save = this.save.bind(this);

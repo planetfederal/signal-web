@@ -6,6 +6,7 @@ import ProcessorItem from "./ProcessorItem";
 import { ProcessorForm } from "./ProcessorForm";
 import PropertyListItem from "./PropertyListItem";
 import "../style/Processors.less";
+import * as R from "ramda";
 
 const format = new ol.format.GeoJSON();
 
@@ -19,7 +20,7 @@ const processorStyle = new ol.style.Style({
   })
 });
 
-const newRuleStyle = new ol.style.Style({
+const newPredicateStyle = new ol.style.Style({
   fill: new ol.style.Fill({
     color: "rgba(0, 0, 255, 0.1)"
   }),
@@ -33,9 +34,9 @@ class ProcessorDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      addingRule: false,
+      addingPredicate: false,
       editing: false,
-      editingRule: false,
+      editingPredicate: false,
       editingProcessor: false,
       creating: false,
       drawing: false,
@@ -43,24 +44,26 @@ class ProcessorDetails extends Component {
       fileUploaded: false,
       uploadedFile: false,
       uploadErr: false,
-      rule_comparator: "$geowithin",
-      activeRules: {}
+      predicate_comparator: "$geowithin",
+      activePredicates: {}
     };
-    this.ruleLayers = {};
+    this.predicateLayers = {};
     this.onSave = this.onSave.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onDraw = this.onDraw.bind(this);
     this.onUpload = this.onUpload.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.onDelete = this.onDelete.bind(this);
-    this.onAddRule = this.onAddRule.bind(this);
-    this.onRuleComparatorChange = this.onRuleComparatorChange.bind(this);
+    this.onAddPredicate = this.onAddPredicate.bind(this);
+    this.onPredicateComparatorChange = this.onPredicateComparatorChange.bind(
+      this
+    );
     this.onEditProcessor = this.onEditProcessor.bind(this);
     this.onCancelEditProcessor = this.onCancelEditProcessor.bind(this);
     this.onEditProcessorSave = this.onEditProcessorSave.bind(this);
-    this.toggleRule = this.toggleRule.bind(this);
-    this.onEditRule = this.onEditRule.bind(this);
-    this.onDeleteRule = this.onDeleteRule.bind(this);
+    this.togglePredicate = this.togglePredicate.bind(this);
+    this.onEditPredicate = this.onEditPredicate.bind(this);
+    this.onDeletePredicate = this.onDeletePredicate.bind(this);
   }
 
   componentDidMount() {
@@ -71,8 +74,10 @@ class ProcessorDetails extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!isEqual(nextProps.processor.rules, this.props.processor.rules)) {
-      this.addRules(nextProps.processor);
+    if (
+      !isEqual(nextProps.processor.predicates, this.props.processor.predicates)
+    ) {
+      this.addPredicates(nextProps.processor);
     }
     if (this.props.menu.open !== nextProps.menu.open) {
       // wait for menu to transition
@@ -84,7 +89,7 @@ class ProcessorDetails extends Component {
     this.map.removeInteraction(this.modify);
     this.map.removeInteraction(this.create);
     this.select.getFeatures().clear();
-    this.newRuleSource.clear();
+    this.newPredicateSource.clear();
     this.setState({
       editing: false,
       creating: false,
@@ -93,7 +98,7 @@ class ProcessorDetails extends Component {
       fileUploaded: false,
       uploadErr: false,
       uploadedFile: false,
-      editingRule: false,
+      editingPredicate: false,
       editingProcessor: false
     });
   }
@@ -109,9 +114,9 @@ class ProcessorDetails extends Component {
     this.map.removeInteraction(this.modify);
     this.map.removeInteraction(this.create);
     this.select.getFeatures().clear();
-    const fcId = `${this.props.processor.id}.${this.props.processor.rules
+    const fcId = `${this.props.processor.id}.${this.props.processor.predicates
       .length + 1}`;
-    const fs = this.newRuleSource.getFeatures().map((f, i) => {
+    const fs = this.newPredicateSource.getFeatures().map((f, i) => {
       f.setId(`${fcId}.${i}`);
       return f;
     });
@@ -126,19 +131,19 @@ class ProcessorDetails extends Component {
       ...f,
       properties: {}
     }));
-    const newRule = {
+    const newPredicate = {
       lhs: ["geometry"],
-      comparator: this.state.rule_comparator,
+      comparator: this.state.predicate_comparator,
       rhs: gj,
       id: Date.now()
     };
     const newProcessor = {
       ...this.props.processor,
-      rules: this.props.processor.rules
-        ? this.props.processor.rules.concat(newRule)
-        : [newRule]
+      predicates: this.props.processor.predicates
+        ? this.props.processor.predicates.concat(newPredicate)
+        : [newPredicate]
     };
-    this.newRuleSource.clear();
+    this.newPredicateSource.clear();
     this.props.actions.updateProcessor(newProcessor);
   }
 
@@ -165,11 +170,11 @@ class ProcessorDetails extends Component {
           const features = format.readFeatures(gj);
           features.forEach(feature => {
             feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-            this.newRuleSource.addFeature(feature);
+            this.newPredicateSource.addFeature(feature);
           });
           this.map
             .getView()
-            .fit(this.newRuleSource.getExtent(), this.map.getSize());
+            .fit(this.newPredicateSource.getExtent(), this.map.getSize());
         } catch (err) {
           this.setState({ uploadErr: "Not valid GeoJSON" });
         }
@@ -182,13 +187,13 @@ class ProcessorDetails extends Component {
     this.props.actions.deleteProcessor(this.props.processor);
   }
 
-  onRuleComparatorChange(e) {
+  onPredicateComparatorChange(e) {
     this.setState({
-      rule_comparator: e.target.value
+      predicate_comparator: e.target.value
     });
   }
 
-  onAddRule() {
+  onAddPredicate() {
     this.setState({ creating: true });
   }
 
@@ -209,27 +214,27 @@ class ProcessorDetails extends Component {
     });
   }
 
-  onEditRule(rule) {
-    const layer = this.ruleLayers[rule.id];
+  onEditPredicate(predicate) {
+    const layer = this.predicateLayers[predicate.id];
     const fs = layer
       .getSource()
       .getFeatures()
       .map(f => f.clone());
-    this.setState({ editingRule: rule.id });
+    this.setState({ editingPredicate: predicate.id });
     this.select.getFeatures().clear();
-    this.newRuleSource.clear();
+    this.newPredicateSource.clear();
     this.map.getView().fit(layer.getSource().getExtent(), this.map.getSize());
     this.map.removeLayer(layer);
-    this.newRuleSource.addFeatures(fs);
+    this.newPredicateSource.addFeatures(fs);
     this.modify = new ol.interaction.Modify({
-      features: new ol.Collection(this.newRuleSource.getFeatures())
+      features: new ol.Collection(this.newPredicateSource.getFeatures())
     });
     this.map.addInteraction(this.modify);
   }
 
-  onSaveRule(rule) {
-    const fcId = `${this.props.processor.id}.${rule.id}`;
-    const fs = this.newRuleSource.getFeatures().map((f, i) => {
+  onSavePredicate(predicate) {
+    const fcId = `${this.props.processor.id}.${predicate.id}`;
+    const fs = this.newPredicateSource.getFeatures().map((f, i) => {
       f.setId(`${fcId}.${i}`);
       return f;
     });
@@ -244,43 +249,50 @@ class ProcessorDetails extends Component {
       ...f,
       properties: {}
     }));
-    const newRule = {
-      ...rule,
+    const newPredicate = {
+      ...predicate,
       rhs: gj
     };
     const newProcessor = {
       ...this.props.processor,
-      rules: this.props.processor.rules.map(r => {
-        if (r.id === newRule.id) {
-          return newRule;
+      predicates: this.props.processor.predicates.map(r => {
+        if (r.id === newPredicate.id) {
+          return newPredicate;
         }
         return r;
       })
     };
     this.setState({
-      editingRule: false
+      editingPredicate: false
     });
     this.map.removeInteraction(this.modify);
-    this.newRuleSource.clear();
+    this.newPredicateSource.clear();
     this.props.actions.updateProcessor(newProcessor);
   }
 
-  onDeleteRule(rule) {
-    const newProcessor = {
-      ...this.props.processor,
-      rules: this.props.processor.rules.filter(r => r.id !== rule.id)
-    };
+  onDeletePredicate(predicate) {
+    const predicates = this.props.processor.definition.predicates.filter(
+      r => r.id !== predicate.id
+    );
+    const newProcessor = R.assocPath(
+      ["definition", "predicates"],
+      R.reject(
+        p => p.id === predicate.id,
+        this.props.processor.definition.predicates
+      ),
+      this.props.processor
+    );
     this.select.getFeatures().clear();
     this.props.actions.updateProcessor(newProcessor);
   }
 
-  onCancelRule(rule) {
-    const layer = this.ruleLayers[rule.id];
+  onCancelPredicate(predicate) {
+    const layer = this.predicateLayers[predicate.id];
     this.map.removeInteraction(this.modify);
-    this.newRuleSource.clear();
+    this.newPredicateSource.clear();
     this.map.addLayer(layer);
     this.setState({
-      editingRule: false
+      editingPredicate: false
     });
   }
 
@@ -288,21 +300,21 @@ class ProcessorDetails extends Component {
     while (this.mapRef.firstChild) {
       this.mapRef.removeChild(this.mapRef.firstChild);
     }
-    this.allRuleSource = new ol.source.Vector();
-    this.newRuleSource = new ol.source.Vector();
-    const newRuleLayer = new ol.layer.Vector({
-      source: this.newRuleSource,
-      style: newRuleStyle
+    this.allPredicateSource = new ol.source.Vector();
+    this.newPredicateSource = new ol.source.Vector();
+    const newPredicateLayer = new ol.layer.Vector({
+      source: this.newPredicateSource,
+      style: newPredicateStyle
     });
     this.select = new ol.interaction.Select({
       wrapX: false,
-      style: newRuleStyle
+      style: newPredicateStyle
     });
     this.modify = new ol.interaction.Modify({
-      features: new ol.Collection(this.newRuleSource.getFeatures())
+      features: new ol.Collection(this.newPredicateSource.getFeatures())
     });
     this.create = new ol.interaction.Draw({
-      source: this.newRuleSource,
+      source: this.newPredicateSource,
       type: "Polygon"
     });
     this.map = new ol.Map({
@@ -312,7 +324,7 @@ class ProcessorDetails extends Component {
         new ol.layer.Tile({
           source: new ol.source.OSM()
         }),
-        newRuleLayer
+        newPredicateLayer
       ],
       view: new ol.View({
         center: ol.proj.fromLonLat([-100, 30]),
@@ -320,70 +332,70 @@ class ProcessorDetails extends Component {
       })
     });
 
-    this.addRules(this.props.processor);
+    this.addPredicates(this.props.processor);
   }
 
-  addRules(processor) {
-    Object.keys(this.ruleLayers).forEach(layerid =>
-      this.map.removeLayer(this.ruleLayers[layerid])
+  addPredicates(processor) {
+    Object.keys(this.predicateLayers).forEach(layerid =>
+      this.map.removeLayer(this.predicateLayers[layerid])
     );
-    this.ruleLayers = {};
-    if (processor.rules && processor.rules.length) {
-      processor.rules.forEach(rule => {
-        if (rule.comparator === "$geowithin") {
-          this.addRule(rule);
+    this.predicateLayers = {};
+    if (processor.predicates && processor.predicates.length) {
+      processor.predicates.forEach(predicate => {
+        if (predicate.comparator === "$geowithin") {
+          this.addPredicate(predicate);
         }
       });
       this.map
         .getView()
-        .fit(this.allRuleSource.getExtent(), this.map.getSize());
+        .fit(this.allPredicateSource.getExtent(), this.map.getSize());
     }
   }
 
-  addRule(rule) {
-    if (isEmpty(rule.rhs)) return;
-    const ruleSource = new ol.source.Vector();
-    const features = format.readFeatures(rule.rhs);
+  addPredicate(predicate) {
+    if (isEmpty(predicate.rhs)) return;
+    const predicateSource = new ol.source.Vector();
+    const features = format.readFeatures(predicate.rhs);
     features.forEach(feature => {
       feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
-      ruleSource.addFeature(feature);
-      this.allRuleSource.addFeature(feature);
+      predicateSource.addFeature(feature);
+      this.allPredicateSource.addFeature(feature);
     });
     const layer = new ol.layer.Vector({
-      source: ruleSource,
+      source: predicateSource,
       style: processorStyle
     });
-    this.ruleLayers[rule.id] = layer;
+    this.predicateLayers[predicate.id] = layer;
     this.map.addLayer(layer);
     this.setState(prevState => ({
-      activeRules: {
-        ...prevState.activeRules,
-        [rule.id]: true
+      activePredicates: {
+        ...prevState.activePredicates,
+        [predicate.id]: true
       }
     }));
   }
 
-  toggleRule(rule) {
-    if (this.ruleLayers[rule.id]) {
-      const layer = this.ruleLayers[rule.id];
-      const active = this.state.activeRules[rule.id];
+  togglePredicate(predicate) {
+    if (this.predicateLayers[predicate.id]) {
+      const layer = this.predicateLayers[predicate.id];
+      const active = this.state.activePredicates[predicate.id];
       if (active) {
         this.map.removeLayer(layer);
       } else {
         this.map.addLayer(layer);
       }
       this.setState(prevState => ({
-        activeRules: {
-          ...prevState.activeRules,
-          [rule.id]: !active
+        activePredicates: {
+          ...prevState.activePredicates,
+          [predicate.id]: !active
         }
       }));
     }
   }
 
-  viewRule(rule) {
-    if (this.ruleLayers[rule.id]) {
-      const layer = this.ruleLayers[rule.id];
+  viewPredicate(predicate) {
+    if (this.predicateLayers[predicate.id]) {
+      const layer = this.predicateLayers[predicate.id];
       const fs = layer.getSource().getFeatures();
       this.map.getView().fit(layer.getSource().getExtent(), this.map.getSize());
       this.select.getFeatures().clear();
@@ -391,50 +403,51 @@ class ProcessorDetails extends Component {
     }
   }
 
-  renderRules() {
-    const ruleList =
+  renderPredicates() {
+    const predicateList =
+      this.props.processor.definition.predicates === undefined ||
       this.props.processor.definition.predicates.length === 0 ? (
         <span className="note">
-          No rules have been added to this processor.
+          No predicates have been added to this processor.
         </span>
       ) : (
-        this.props.processor.rules.map(rule => (
+        this.props.processor.definition.predicates.map(p => (
           <div className="form-item mini">
             <div className="properties">
-              <PropertyListItem
-                name={"Type"}
-                value={rule.comparator.replace("$", "")}
-              />
+              <PropertyListItem name={"Type"} value={p.type} />
             </div>
-            {this.state.editingRule === rule.id ? (
+            {this.state.editingPredicate === p.id ? (
               <div className="btn-toolbar plain">
                 <span
                   className="btn-plain"
-                  onClick={() => this.onSaveRule(rule)}
+                  onClick={() => this.onSavePredicate(p)}
                 >
                   Save
                 </span>
                 <span
                   className="btn-plain"
-                  onClick={() => this.onCancelRule(rule)}
+                  onClick={() => this.onCancelPredicate(p)}
                 >
                   Cancel
                 </span>
               </div>
             ) : (
               <div className="btn-toolbar plain">
-                <span className="btn-plain" onClick={() => this.viewRule(rule)}>
+                <span
+                  className="btn-plain"
+                  onClick={() => this.viewPredicate(p)}
+                >
                   View
                 </span>
                 <span
                   className="btn-plain"
-                  onClick={() => this.onEditRule(rule)}
+                  onClick={() => this.onEditPredicate(p)}
                 >
                   Edit
                 </span>
                 <span
                   className="btn-plain"
-                  onClick={() => this.onDeleteRule(rule)}
+                  onClick={() => this.onDeletePredicate(p)}
                 >
                   Delete
                 </span>
@@ -445,12 +458,12 @@ class ProcessorDetails extends Component {
       );
     return (
       <div>
-        <h4>Rules</h4>
-        <div className="rule-list">{ruleList}</div>
+        <h4>Predicates</h4>
+        <div className="predicate-list">{predicateList}</div>
         {!this.state.creating && (
           <div className="btn-toolbar">
-            <button className="btn btn-sc" onClick={this.onAddRule}>
-              Add Rule
+            <button className="btn btn-sc" onClick={this.onAddPredicate}>
+              Add Predicate
             </button>
           </div>
         )}
@@ -506,15 +519,15 @@ class ProcessorDetails extends Component {
     );
     if (this.state.creating) {
       return (
-        <div className="add-rule">
-          <h4>Add Rule</h4>
+        <div className="add-predicate">
+          <h4>Add Predicate</h4>
           <div className="form-group">
-            <label htmlFor="comparator">Rule Type:</label>
+            <label htmlFor="comparator">Predicate Type:</label>
             <select
               id="comparator"
               className="form-control"
-              value={this.state.rule_comparator}
-              onChange={this.onRuleComparatorChange}
+              value={this.state.predicate_comparator}
+              onChange={this.onPredicateComparatorChange}
             >
               <option value="$geowithin">geowithin</option>
             </select>
@@ -562,6 +575,7 @@ class ProcessorDetails extends Component {
               onSave={this.onEditProcessorSave}
               errors={this.props.errors}
               actions={this.props.actions}
+              capabilities={this.props.capabilities}
             />
           </section>
         </div>
@@ -572,7 +586,7 @@ class ProcessorDetails extends Component {
         <div className="processor-props">
           <ProcessorItem processor={processor} />
           {this.renderEditing()}
-          {this.renderRules()}
+          {this.renderPredicates()}
           {this.renderCreating()}
         </div>
         <div
