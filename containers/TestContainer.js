@@ -42,8 +42,16 @@ class TestContainer extends Component {
   componentDidMount() {
     this.createMap();
     window.addEventListener("resize", () => {
+      console.log("cdm");
       this.createMap();
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.menu.open !== nextProps.menu.open) {
+      // wait for menu to transition
+      setTimeout(() => this.map.updateSize(), 200);
+    }
   }
 
   onChange(e) {
