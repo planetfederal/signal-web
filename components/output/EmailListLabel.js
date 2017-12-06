@@ -9,7 +9,7 @@ const EmailItem = ({ output }) => (
 );
 
 EmailItem.propTypes = {
-  processor: PropTypes.object.isRequired
+  output: PropTypes.object.isRequired
 };
 
 export default EmailItem;

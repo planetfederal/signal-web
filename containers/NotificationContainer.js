@@ -2,17 +2,25 @@ import React, { Component, PropTypes } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import find from "lodash/find";
-import NotificationDetails from "../components/NotificationDetails";
+import NotificationView from "../components/notification/NotificationView";
 import * as notificationActions from "../ducks/notifications";
-import NotificationList from "../components/NotificationList";
+import NotificationList from "../components/notification/NotificationList";
 
 class NotificationContainer extends Component {
   constructor(props) {
     super(props);
   }
 
+  componentDidMount() {
+    this.props.notificationActions.loadNotifications();
+  }
+
   render() {
-    if (this.props.notifications && this.props.notifications.length > 0) {
+    const { children, notifications } = this.props;
+    if (children) {
+      return <div className="wrapper">{children}</div>;
+    }
+    if (notifications && notifications.length > 0) {
       return <NotificationList {...this.props} />;
     }
     return (

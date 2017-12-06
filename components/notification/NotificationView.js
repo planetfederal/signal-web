@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from "react";
 import isEmpty from "lodash/isEmpty";
-import NotificationItem from "./NotificationItem";
-import "../style/Processors.less";
+import NotificationListLabel from "./NotificationListLabel";
+import "./../../style/Processors.less";
 
 const format = new ol.format.GeoJSON();
 
@@ -56,7 +56,7 @@ const style = {
   }
 };
 
-class NotificationDetails extends Component {
+class NotificationView extends Component {
   static makePopup(geojson) {
     let rows = [];
     if (geojson.geometry.type === "Point") {
@@ -213,7 +213,7 @@ class NotificationDetails extends Component {
         <section className="main noPad">
           <div className="processor-details">
             <div className="processor-props">
-              <NotificationItem notification={this.props.notification} />
+              <NotificationListLabel notification={this.props.notification} />
             </div>
             <div
               className="processor-map"
@@ -233,7 +233,7 @@ class NotificationDetails extends Component {
             }}
           >
             {!!this.state.activeFeature &&
-              NotificationDetails.makePopup(this.state.activeFeature)}
+              NotificationView.makePopup(this.state.activeFeature)}
           </div>
         </section>
       </div>
@@ -241,9 +241,9 @@ class NotificationDetails extends Component {
   }
 }
 
-NotificationDetails.propTypes = {
+NotificationView.propTypes = {
   notification: PropTypes.object.isRequired,
   menu: PropTypes.object.isRequired
 };
 
-export default NotificationDetails;
+export default NotificationView;

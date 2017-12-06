@@ -1,20 +1,20 @@
-import React, { Component, PropTypes } from 'react';
-import { findDOMNode } from 'react-dom';
-import { DragSource, DropTarget } from 'react-dnd';
-import classNames from 'classnames';
-import flow from 'lodash/flow';
+import React, { Component, PropTypes } from "react";
+import { findDOMNode } from "react-dom";
+import { DragSource, DropTarget } from "react-dnd";
+import classNames from "classnames";
+import flow from "lodash/flow";
 
 const ItemTypes = {
-  FIELD: 'field',
+  FIELD: "field"
 };
 
 const fieldSource = {
   beginDrag(props) {
     return {
       id: props.id,
-      index: props.index,
+      index: props.index
     };
-  },
+  }
 };
 
 const fieldTarget = {
@@ -60,34 +60,46 @@ const fieldTarget = {
     // but it's good here for the sake of performance
     // to avoid expensive index searches.
     monitor.getItem().index = hoverIndex;
-  },
+  }
 };
 
 function collectSource(connect, monitor) {
   return {
     connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging(),
+    isDragging: monitor.isDragging()
   };
 }
 
 function collectTarget(connect) {
   return {
-    connectDropTarget: connect.dropTarget(),
+    connectDropTarget: connect.dropTarget()
   };
 }
 
 class Field extends Component {
-
   render() {
-    const { field, form, id, input, connectDragSource, connectDropTarget } = this.props;
-    return connectDragSource(connectDropTarget(
-      <div
-        className={classNames('field-wrap', { active: id === form.activeField })}
-        onClick={() => this.props.updateActiveField(form.form_key, field.field_key)}
-      >
-        {input}
-      </div>,
-    ));
+    const {
+      field,
+      form,
+      id,
+      input,
+      connectDragSource,
+      connectDropTarget
+    } = this.props;
+    return connectDragSource(
+      connectDropTarget(
+        <div
+          className={classNames("field-wrap", {
+            active: id === form.activeField
+          })}
+          onClick={() =>
+            this.props.updateActiveField(form.form_key, field.field_key)
+          }
+        >
+          {input}
+        </div>
+      )
+    );
   }
 }
 
@@ -98,11 +110,10 @@ Field.propTypes = {
   connectDropTarget: PropTypes.func.isRequired,
   updateActiveField: PropTypes.func.isRequired,
   form: PropTypes.object.isRequired,
-  id: PropTypes.number.isRequired,
+  id: PropTypes.number.isRequired
 };
-
 
 export default flow(
   DragSource(ItemTypes.FIELD, fieldSource, collectSource),
-  DropTarget(ItemTypes.FIELD, fieldTarget, collectTarget),
+  DropTarget(ItemTypes.FIELD, fieldTarget, collectTarget)
 )(Field);

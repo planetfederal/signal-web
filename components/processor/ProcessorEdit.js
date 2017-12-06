@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from "react";
 import without from "lodash/without";
-import { isEmail } from "../utils";
-import WebhookForm from "./output/WebhookForm";
-import EmailForm from "./output/EmailForm";
+import { isEmail } from "../../utils";
+import WebhookEdit from "./../output/WebhookEdit";
+import EmailEdit from "./../output/EmailEdit";
 import * as R from "ramda";
 
 export const validate = values => {
@@ -19,7 +19,7 @@ export const validate = values => {
   return errors;
 };
 
-export class ProcessorForm extends Component {
+export class ProcessorEdit extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -77,14 +77,14 @@ export class ProcessorForm extends Component {
     switch (outputType) {
       case "email":
         return (
-          <EmailForm
+          <EmailEdit
             onChange={this.onOutputValueChange}
             value={this.state.definition.output}
           />
         );
       case "webhook":
         return (
-          <WebhookForm
+          <WebhookEdit
             onChange={this.onOutputValueChange}
             value={this.state.definition.output}
           />
@@ -205,7 +205,7 @@ export class ProcessorForm extends Component {
   }
 }
 
-ProcessorForm.propTypes = {
+ProcessorEdit.propTypes = {
   processor: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
   cancel: PropTypes.func.isRequired,
@@ -213,4 +213,4 @@ ProcessorForm.propTypes = {
   onSave: PropTypes.func.isRequired
 };
 
-export default ProcessorForm;
+export default ProcessorEdit;

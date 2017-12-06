@@ -2,7 +2,7 @@ import React, { PropTypes } from "react";
 import * as R from "ramda";
 import { Link } from "react-router";
 
-const EmailForm = props => {
+const EmailEdit = props => {
   const { recipients } = props.value;
   return (
     <div className="form-group">
@@ -23,6 +23,6 @@ const EmailForm = props => {
   );
 };
 
-EmailForm.propTypes = {};
+EmailEdit.propTypes = {};
 
-export default EmailForm;
+export default EmailEdit;

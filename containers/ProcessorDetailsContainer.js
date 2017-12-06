@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import find from "lodash/find";
-import ProcessorDetails from "../components/ProcessorDetails";
+import ProcessorView from "../components/processor/ProcessorView";
 import * as processorActions from "../ducks/processors";
 
 class ProcessorDetailsContainer extends Component {
@@ -15,7 +15,7 @@ class ProcessorDetailsContainer extends Component {
   render() {
     return (
       <section className="main noPad">
-        {this.props.processor ? <ProcessorDetails {...this.props} /> : null}
+        {this.props.processor ? <ProcessorView {...this.props} /> : null}
       </section>
     );
   }

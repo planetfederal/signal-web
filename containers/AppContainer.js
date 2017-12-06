@@ -1,17 +1,17 @@
-import React, { Component, PropTypes } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Header from '../components/Header';
-import SideMenu from '../components/SideMenu';
-import * as authActions from '../ducks/auth';
-import * as menuActions from '../ducks/menu';
-import '../style/App.less';
+import React, { Component, PropTypes } from "react";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import Header from "../components/Header";
+import SideMenu from "../components/SideMenu";
+import * as authActions from "../ducks/auth";
+import * as menuActions from "../ducks/menu";
+import "../style/App.less";
 
 const getWindowWidth = () => {
   const w = window;
   const d = document;
   const documentElement = d.documentElement;
-  const body = d.getElementsByTagName('body')[0];
+  const body = d.getElementsByTagName("body")[0];
   const width = w.innerWidth || documentElement.clientWidth || body.clientWidth;
 
   return width;
@@ -21,7 +21,7 @@ class AppContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      width: getWindowWidth(),
+      width: getWindowWidth()
     };
 
     this.toggleMenu = this.toggleMenu.bind(this);
@@ -29,7 +29,7 @@ class AppContainer extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.updateDimensions.bind(this));
+    window.addEventListener("resize", this.updateDimensions.bind(this));
     if (getWindowWidth() >= 600) {
       this.props.menuActions.openMenu();
     } else {
@@ -37,7 +37,7 @@ class AppContainer extends Component {
     }
   }
   componentWillUnmount() {
-    window.removeEventListener('resize', this.updateDimensions.bind(this));
+    window.removeEventListener("resize", this.updateDimensions.bind(this));
   }
 
   toggleMenu() {
@@ -74,19 +74,19 @@ class AppContainer extends Component {
 AppContainer.propTypes = {
   children: PropTypes.object,
   menu: PropTypes.object.isRequired,
-  menuActions: PropTypes.object.isRequired,
+  menuActions: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => ({
   isAuthenticated: true,
   userName: state.sc.auth.user.name,
   id: ownProps.params.id,
-  menu: state.sc.menu,
+  menu: state.sc.menu
 });
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(authActions, dispatch),
-  menuActions: bindActionCreators(menuActions, dispatch),
+  menuActions: bindActionCreators(menuActions, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppContainer);

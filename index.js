@@ -20,6 +20,8 @@ import ProcessorsContainer from "./containers/ProcessorsContainer";
 import ProcessorDetailsContainer from "./containers/ProcessorDetailsContainer";
 import NotificationContainer from "./containers/NotificationContainer";
 import NotificationDetailsContainer from "./containers/NotificationDetailsContainer";
+import InputContainer from "./containers/InputContainer";
+import InputDetailsContainer from "./containers/InputDetailsContainer";
 import TestContainer from "./containers/TestContainer";
 
 import "./style/Globals.less";
@@ -85,6 +87,17 @@ render(
             path="/notifications/:id"
             staticName
             component={requireAuthentication(NotificationDetailsContainer)}
+          />
+        </Route>
+        <Route
+          path="/inputs"
+          name="Inputs"
+          component={requireAuthentication(InputContainer)}
+        >
+          <Route
+            path="/inputs/:id"
+            staticName
+            component={requireAuthentication(InputDetailsContainer)}
           />
         </Route>
         <Route

@@ -9,7 +9,7 @@ const WebhookItem = ({ output }) => (
 );
 
 WebhookItem.propTypes = {
-  processor: PropTypes.object.isRequired
+  output: PropTypes.object.isRequired
 };
 
 export default WebhookItem;

@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as processorActions from "../ducks/processors";
-import { ProcessorForm } from "../components/ProcessorForm";
-import ProcessorList from "../components/ProcessorList";
+import ProcessorEdit from "../components/processor/ProcessorEdit";
+import ProcessorList from "../components/processor/ProcessorList";
 import uuidv4 from "uuid/v4";
 
 class ProcessorsContainer extends Component {
@@ -60,7 +60,7 @@ class ProcessorsContainer extends Component {
       <div className="wrapper">
         <section className="main">
           {this.state.adding ? (
-            <ProcessorForm
+            <ProcessorEdit
               processor={emptyProcessor}
               capabilities={capabilities}
               cancel={this.cancel}

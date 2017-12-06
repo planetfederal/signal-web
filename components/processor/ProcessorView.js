@@ -2,10 +2,11 @@ import React, { Component, PropTypes } from "react";
 import Dropzone from "react-dropzone";
 import isEqual from "lodash/isEqual";
 import isEmpty from "lodash/isEmpty";
-import ProcessorItem from "./ProcessorItem";
-import { ProcessorForm } from "./ProcessorForm";
-import PropertyListItem from "./PropertyListItem";
-import "../style/Processors.less";
+import uuidv4 from "uuid/v4";
+import ProcessorListLabel from "./ProcessorListLabel";
+import ProcessorEdit from "./ProcessorEdit";
+import PropertyListItem from "./../PropertyListItem";
+import "./../../style/Processors.less";
 import * as R from "ramda";
 
 const format = new ol.format.GeoJSON();
@@ -44,7 +45,7 @@ class ProcessorDetails extends Component {
       fileUploaded: false,
       uploadedFile: false,
       uploadErr: false,
-      predicate_comparator: "$geowithin",
+      predicate_comparator: "geowithin",
       activePredicates: {}
     };
     this.predicateLayers = {};
@@ -114,8 +115,8 @@ class ProcessorDetails extends Component {
     this.map.removeInteraction(this.modify);
     this.map.removeInteraction(this.create);
     this.select.getFeatures().clear();
-    const fcId = `${this.props.processor.id}.${this.props.processor.predicates
-      .length + 1}`;
+    const fcId = `${this.props.processor.id}.${this.props.processor.definition
+      .predicates.length + 1}`;
     const fs = this.newPredicateSource.getFeatures().map((f, i) => {
       f.setId(`${fcId}.${i}`);
       return f;
@@ -132,17 +133,16 @@ class ProcessorDetails extends Component {
       properties: {}
     }));
     const newPredicate = {
-      lhs: ["geometry"],
-      comparator: this.state.predicate_comparator,
-      rhs: gj,
-      id: Date.now()
+      id: uuidv4(),
+      definition: gj,
+      type: this.state.predicate_comparator
     };
-    const newProcessor = {
-      ...this.props.processor,
-      predicates: this.props.processor.predicates
-        ? this.props.processor.predicates.concat(newPredicate)
-        : [newPredicate]
-    };
+    const { processor } = this.props;
+    const newProcessor = R.assocPath(
+      ["definition", "predicates"],
+      R.concat(processor.definition.predicates, [newPredicate]),
+      this.props.processor
+    );
     this.newPredicateSource.clear();
     this.props.actions.updateProcessor(newProcessor);
   }
@@ -569,7 +569,7 @@ class ProcessorDetails extends Component {
       return (
         <div className="wrapper">
           <section className="main">
-            <ProcessorForm
+            <ProcessorEdit
               processor={processor}
               cancel={this.onCancelEditProcessor}
               onSave={this.onEditProcessorSave}
@@ -584,7 +584,7 @@ class ProcessorDetails extends Component {
     return (
       <div className="processor-details">
         <div className="processor-props">
-          <ProcessorItem processor={processor} />
+          <ProcessorListLabel processor={processor} />
           {this.renderEditing()}
           {this.renderPredicates()}
           {this.renderCreating()}

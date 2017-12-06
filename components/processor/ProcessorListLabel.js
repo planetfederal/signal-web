@@ -1,19 +1,19 @@
 import React, { PropTypes } from "react";
 import { Link } from "react-router";
-import PropertyListItem from "./PropertyListItem";
-import EmailItem from "./output/EmailItem";
-import WebhookItem from "./output/WebhookItem";
+import PropertyListItem from "./../PropertyListItem";
+import EmailListLabel from "./../output/EmailListLabel";
+import WebhookListLabel from "./../output/WebhookListLabel";
 
 function getOutput(output) {
   switch (output.type) {
     case "email":
-      return <EmailItem output={output} />;
+      return <EmailListLabel output={output} />;
     case "webhook":
-      return <WebhookItem output={output} />;
+      return <WebhookListLabel output={output} />;
   }
 }
 
-const ProcessorItem = ({ processor }) => (
+const ProcessorListLabel = ({ processor }) => (
   <div className="form-item">
     <h4>
       <Link to={`/processors/${processor.id}`}>{processor.name}</Link>
@@ -23,8 +23,8 @@ const ProcessorItem = ({ processor }) => (
   </div>
 );
 
-ProcessorItem.propTypes = {
+ProcessorListLabel.propTypes = {
   processor: PropTypes.object.isRequired
 };
 
-export default ProcessorItem;
+export default ProcessorListLabel;

@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import find from "lodash/find";
-import NotificationDetails from "../components/NotificationDetails";
+import NotificationView from "../components/notification/NotificationView";
 import * as notificationActions from "../ducks/notifications";
 
 class NotificationDetailsContainer extends Component {
@@ -15,9 +15,7 @@ class NotificationDetailsContainer extends Component {
   render() {
     return (
       <section className="main noPad">
-        {this.props.notification ? (
-          <NotificationDetails {...this.props} />
-        ) : null}
+        {this.props.notification ? <NotificationView {...this.props} /> : null}
       </section>
     );
   }
