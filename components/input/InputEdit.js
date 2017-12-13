@@ -70,7 +70,7 @@ export class InputEdit extends Component {
           />
         </div>
         <div className="form-group">
-          <label>Output</label>
+          <label>Type</label>
           <select
             id="input-type"
             className="form-control"
