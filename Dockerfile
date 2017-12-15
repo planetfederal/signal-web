@@ -11,7 +11,7 @@ COPY . /web
 RUN rm -rf /web/node_modules/
 WORKDIR /web
 RUN npm install
-RUN npm run build:dev
+RUN npm run build
 
 # COPY ./nginx-config/signal.conf /etc/nginx/conf.d/signal.conf
 # COPY ./nginx-config/signal-tls.conf /

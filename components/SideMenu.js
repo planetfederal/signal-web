@@ -33,7 +33,7 @@ const SideMenu = ({ isAuthenticated, closeMenu, menuOpen }) => (
         <div className="side-menu-separator" />
         <SideMenuItem path={"/inputs"} name={"Input"} onClick={closeMenu} />
         <div className="side-menu-separator" />
-        <SideMenuItem path={"/test"} name={"Test"} onClick={closeMenu} />
+        {/* <SideMenuItem path={"/test"} name={"Test"} onClick={closeMenu} /> */}
         <div className="side-menu-item bottom">
           <span>{`v${VERSION}`}</span>
         </div>

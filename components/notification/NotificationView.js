@@ -114,18 +114,19 @@ class NotificationView extends Component {
   }
 
   addRules(processor) {
-    if (processor.rules) {
-      processor.rules.forEach(rule => {
-        if (rule.comparator === "$geowithin") {
-          this.addProcessor(rule);
+    const predicates = R.path(["definition", "predicates"], processor);
+    if (predicates) {
+      predicates.forEach(p => {
+        if (p.type === "geowithin") {
+          this.addPredicate(p);
         }
       });
     }
   }
 
-  addProcessor(rule) {
-    if (isEmpty(rule.rhs)) return;
-    const features = format.readFeatures(rule.rhs);
+  addPredicate(predicate) {
+    if (isEmpty(predicate.definition)) return;
+    const features = format.readFeatures(predicate.definition);
     features.forEach(feature => {
       feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
       this.processorSource.addFeature(feature);

@@ -20,9 +20,6 @@ const WebhookForm = props => {
         value={verb}
         onChange={R.partial(props.onChange, ["verb"])}
       >
-        <option key="get" value="get">
-          GET
-        </option>
         <option key="post" value="post">
           POST
         </option>
