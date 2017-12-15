@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from "react";
 import isEmpty from "lodash/isEmpty";
 import NotificationListLabel from "./NotificationListLabel";
 import "./../../style/Processors.less";
+import * as R from "ramda";
 
 const format = new ol.format.GeoJSON();
 
@@ -134,11 +135,11 @@ class NotificationView extends Component {
       .fit(this.processorSource.getExtent(), this.map.getSize());
   }
 
-  addValue(value) {
+  addValue(source, value) {
     const feature = format.readFeature(value);
     feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
     feature.setStyle(iconStyle);
-    this.valueSource.addFeature(feature);
+    source.addFeature(feature);
   }
 
   createMap() {
@@ -203,7 +204,13 @@ class NotificationView extends Component {
       this.addRules(info.processor);
     }
     if (info.value) {
-      this.addValue(info.value);
+      if (info.value.type === "GeometryCollection") {
+        info.value.geometries.map(R.partial(this.addValue, [this.valueSource]));
+      } else if (info.value.type === "FeatureCollection") {
+        info.value.features.map(R.partial(this.addValue, [this.valueSource]));
+      } else {
+        this.addValue(this.valueSource, info.value);
+      }
     }
   }
 

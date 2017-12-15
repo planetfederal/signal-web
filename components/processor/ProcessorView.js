@@ -31,7 +31,7 @@ const newPredicateStyle = new ol.style.Style({
   })
 });
 
-class ProcessorDetails extends Component {
+class ProcessorView extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -69,14 +69,18 @@ class ProcessorDetails extends Component {
 
   componentDidMount() {
     this.createMap();
-    window.addEventListener("resize", () => {
-      this.createMap();
-    });
+    this.addPredicates(this.props.processor);
+    // window.addEventListeer("resize", () => {
+    //   this.createMap();
+    // });
   }
 
   componentWillReceiveProps(nextProps) {
     if (
-      !isEqual(nextProps.processor.predicates, this.props.processor.predicates)
+      !isEqual(
+        nextProps.processor.definition.predicates,
+        this.props.processor.definition.predicates
+      )
     ) {
       this.addPredicates(nextProps.processor);
     }
@@ -255,7 +259,7 @@ class ProcessorDetails extends Component {
     };
     const newProcessor = {
       ...this.props.processor,
-      predicates: this.props.processor.predicates.map(r => {
+      predicates: this.props.processor.definition.predicates.map(r => {
         if (r.id === newPredicate.id) {
           return newPredicate;
         }
@@ -336,13 +340,14 @@ class ProcessorDetails extends Component {
   }
 
   addPredicates(processor) {
+    const { predicates } = this.props.processor.definition;
     Object.keys(this.predicateLayers).forEach(layerid =>
       this.map.removeLayer(this.predicateLayers[layerid])
     );
     this.predicateLayers = {};
-    if (processor.predicates && processor.predicates.length) {
-      processor.predicates.forEach(predicate => {
-        if (predicate.comparator === "$geowithin") {
+    if (predicates && predicates.length) {
+      predicates.forEach(predicate => {
+        if (predicate.type === "geowithin") {
           this.addPredicate(predicate);
         }
       });
@@ -353,9 +358,9 @@ class ProcessorDetails extends Component {
   }
 
   addPredicate(predicate) {
-    if (isEmpty(predicate.rhs)) return;
+    if (isEmpty(predicate)) return;
     const predicateSource = new ol.source.Vector();
-    const features = format.readFeatures(predicate.rhs);
+    const features = format.readFeatures(predicate.definition);
     features.forEach(feature => {
       feature.getGeometry().transform("EPSG:4326", "EPSG:3857");
       predicateSource.addFeature(feature);
@@ -412,7 +417,7 @@ class ProcessorDetails extends Component {
         </span>
       ) : (
         this.props.processor.definition.predicates.map(p => (
-          <div className="form-item mini">
+          <div className="form-item mini" key={p.id}>
             <div className="properties">
               <PropertyListItem name={"Type"} value={p.type} />
             </div>
@@ -600,11 +605,11 @@ class ProcessorDetails extends Component {
   }
 }
 
-ProcessorDetails.propTypes = {
+ProcessorView.propTypes = {
   processor: PropTypes.object.isRequired,
   menu: PropTypes.object.isRequired,
   actions: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
 
-export default ProcessorDetails;
+export default ProcessorView;

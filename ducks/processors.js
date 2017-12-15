@@ -11,7 +11,7 @@ export const DELETE_PROCESSOR = "sc/processors/DELETE_PROCESSOR";
 export const PROCESSOR_ERRORS = "sc/processors/PROCESSOR_ERRORS";
 export const LOAD_CAPABILITIES = "sc/capabilities/LOAD_CAPABILITIES";
 
-const initialState = {
+export const initialState = {
   spatial_processors: {},
   errors: {},
   capabilities: {
@@ -78,11 +78,8 @@ export function updateProcessorErrors(errors) {
 
 export function updateProcessor(processor) {
   return (dispatch, getState) => {
-    const { sc } = getState();
-    const token = sc.auth.token;
     return request
       .put(`${API_URL}processors/${processor.id}`)
-      .set("Authorization", `Token ${token}`)
       .send(processor)
       .then(
         () => dispatch(loadProcessor(processor.id, true)),
@@ -140,12 +137,9 @@ export function deleteProcessor(processor) {
 }
 
 export function loadProcessor(processorId) {
-  return (dispatch, getState) => {
-    const { sc } = getState();
-    const token = sc.auth.token;
+  return (dispatch) => {
     return request
       .get(`${API_URL}processors/${processorId}`)
-      .set("Authorization", `Token ${token}`)
       .then(res => res.body.result)
       .then(data => dispatch(receiveProcessor(data)));
   };
@@ -153,11 +147,8 @@ export function loadProcessor(processorId) {
 
 export function loadProcessors() {
   return (dispatch, getState) => {
-    const { sc } = getState();
-    const token = sc.auth.token;
     return request
       .get(`${API_URL}processors`)
-      .set("Authorization", `Token ${token}`)
       .then(res => res.body.result)
       .then(data => dispatch(receiveProcessors(data)));
   };

@@ -45,12 +45,7 @@ class ProcessorsContainer extends Component {
       persistent: false,
       definition: {
         output: capabilities.outputs[1],
-        predicates: [
-          {
-            id: uuidv4(),
-            type: "identity"
-          }
-        ]
+        predicates: []
       }
     };
     if (children) {
