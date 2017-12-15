@@ -13,9 +13,9 @@ WORKDIR /web
 RUN npm install
 RUN npm run build
 
-# COPY ./nginx-config/signal.conf /etc/nginx/conf.d/signal.conf
+COPY ./nginx-config/signal.conf /etc/nginx/conf.d/default.conf
 # COPY ./nginx-config/signal-tls.conf /
-RUN cp -r ./public/ /usr/share/nginx/html
+RUN cp -r ./public/* /usr/share/nginx/html/
 
 # COPY ./nginx-config/start.sh /
 # COPY dhparams.pem /etc/ssl/private/

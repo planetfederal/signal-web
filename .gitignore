@@ -88,3 +88,6 @@ public/index.html
 
 # ignore kafka & zookeeper data
 data
+
+# don't check in ENV vars
+docker-compose.yml

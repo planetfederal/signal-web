@@ -1,15 +1,49 @@
 version: '2'
+volumes:
+  pg-data:
+    driver: local
 services:
-  nginx:
-    image: jwilder/nginx-proxy
-    ports:
-      - '80:80'
+  db:
+    container_name: db
+    build: ./docker/postgis
+    image: signal/postgis:latest
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  pgweb:
+    container_name: pgweb  # optional
+    restart: always  # optional
+    image: sosedoff/pgweb
+    ports:
+      - "8081:8081"
+    links:
+      - db:db  # my database container is called postgres, not db
+    environment:
+      - DATABASE_URL=postgres://signal:signal@db:5432/signal?sslmode=disable
+    depends_on:
+      - db
+  signal-server:
+    image: quay.io/boundlessgeo/signal:latest
+    ports:
+      - "8085:8085"
+    depends_on:
+      - db
+    environment:
+      - SMTP_USERNAME=<SETME>
+      - SMTP_PASSWORD=<SETME>
+      - HOSTNAME=signal.boundlessgeo.com
+      - DB_HOST=db
+      - VIRTUAL_HOST=signal-server
+      - TRUST_STORE=/usr/src/app/tls/test-cacerts.jks
+      - KEY_STORE=/usr/src/app/tls/test-keystore.p12
+      - AUTO_MIGRATE=true
   signal-web:
     build: .
     ports:
-      - '8080:80'
+      - '80:80'
+    depends_on:
+      - signal-server
     environment:
       - VIRTUAL_HOST=signal-web
       - DOMAIN_NAME=signal-web
