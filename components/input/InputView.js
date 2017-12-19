@@ -1,6 +1,6 @@
-import React, { Component, PropTypes } from "react";
-import "./../../style/Processors.less";
-import HttpView from "./HttpView";
+import React, { Component, PropTypes } from 'react';
+import './../../style/Processors.less';
+import HttpView from './HttpView';
 
 class InputView extends Component {
   constructor(props) {
@@ -11,7 +11,9 @@ class InputView extends Component {
 
   onEdit() {}
 
-  onDelete() {}
+  onDelete() {
+    this.props.actions.deleteInput(this.props.input);
+  }
 
   render() {
     const { input } = this.props;
