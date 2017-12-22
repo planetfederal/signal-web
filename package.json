@@ -1,11 +1,12 @@
 {
   "name": "signal-server-dashboard",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Dashboard for signal",
   "scripts": {
     "test": "NODE_ENV=local jest",
     "test:watch": "npm test -- --watch",
-    "start:local": "NODE_ENV=local webpack-dev-server --progress --inline --config webpack.local.js",
+    "start:local":
+      "NODE_ENV=local webpack-dev-server --progress --inline --config webpack.local.js",
     "build:local": "NODE_ENV=local webpack --config webpack.local.js",
     "build:dev": "NODE_ENV=development webpack",
     "build:cf": "NODE_ENV=cf webpack",
@@ -76,9 +77,7 @@
   },
   "jest": {
     "testRegex": "/test/spec/.*\\.js$",
-    "transformIgnorePatterns": [
-      "/node_modules/(?!test-component).+\\.js$"
-    ],
+    "transformIgnorePatterns": ["/node_modules/(?!test-component).+\\.js$"],
     "moduleNameMapper": {
       "config": "<rootDir>/config/local.js"
     },

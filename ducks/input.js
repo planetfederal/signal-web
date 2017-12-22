@@ -1,6 +1,6 @@
 import * as request from 'superagent-bluebird-promise';
-import { API_URL } from 'config';
-import { push } from 'react-router-redux';
+import {API_URL} from 'config';
+import {push} from 'react-router-redux';
 import * as R from 'ramda';
 
 export const LOAD_INPUT = 'sc/processors/LOAD_INPUT';
@@ -8,7 +8,7 @@ export const LOAD_INPUTS = 'sc/processors/LOAD_INPUTS';
 export const DELETE_INPUT = 'sc/processors/DELETE_INPUT';
 
 const initialState = {
-  inputs: []
+  inputs: [],
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -16,17 +16,17 @@ export default function reducer(state = initialState, action = {}) {
     case LOAD_INPUT:
       return {
         ...state,
-        inputs: state.inputs.concat(action.payload.notification)
+        inputs: state.inputs.concat(action.payload.notification),
       };
     case LOAD_INPUTS:
       return {
         ...state,
-        inputs: action.payload.inputs
+        inputs: action.payload.inputs,
       };
     case DELETE_INPUT:
       return {
         ...state,
-        inputs: R.reject(i => i.id === action.payload.input.id, state.inputs)
+        inputs: R.reject(i => i.id === action.payload.input.id, state.inputs),
       };
     default:
       return state;
@@ -35,7 +35,7 @@ export default function reducer(state = initialState, action = {}) {
 
 export function addInput(i) {
   return (dispatch, getState) => {
-    const { sc } = getState();
+    const {sc} = getState();
     const token = sc.auth.token;
     return request
       .post(`${API_URL}inputs`)
@@ -43,7 +43,22 @@ export function addInput(i) {
       .send(i)
       .then(
         () => dispatch(loadInputs()),
-        err => dispatch(updateProcessorErrors(err.body.error))
+        err => dispatch(updateProcessorErrors(err.body.error)),
+      );
+  };
+}
+
+export function updateInput(i) {
+  return dispatch => {
+    return request
+      .put(`${API_URL}inputs/` + i.id)
+      .send(i)
+      .then(
+        () => {
+          dispatch(loadInputs());
+          dispatch(push('/inputs'));
+        },
+        err => dispatch(updateProcessorErrors(err.body.error)),
       );
   };
 }
@@ -51,14 +66,14 @@ export function addInput(i) {
 export function receiveInputs(inputs) {
   return {
     type: LOAD_INPUTS,
-    payload: { inputs }
+    payload: {inputs},
   };
 }
 
 export function receiveInput(notification) {
   return {
     type: LOAD_INPUT,
-    payload: { notification }
+    payload: {notification},
   };
 }
 
@@ -70,12 +85,12 @@ export function loadInputs() {
       .then(data => dispatch(receiveInputs(data)));
 }
 
-export function loadInput(notificationId) {
+export function loadInput(inputId) {
   return (dispatch, getState) => {
-    const { sc } = getState();
+    const {sc} = getState();
     const token = sc.auth.token;
     return request
-      .get(`${API_URL}inputs/${notificationId}`)
+      .get(`${API_URL}inputs/${inputId}`)
       .set('Authorization', `Token ${token}`)
       .then(res => res.body.result)
       .then(data => dispatch(receiveInput(data)));
@@ -87,7 +102,7 @@ export function deleteInput(input) {
     return request.delete(`${API_URL}inputs/${input.id}`).then(() => {
       dispatch({
         type: DELETE_INPUT,
-        payload: { input }
+        payload: {input},
       });
       dispatch(push('/inputs'));
     });
