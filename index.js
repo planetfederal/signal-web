@@ -1,35 +1,36 @@
-import React from "react";
-import { render } from "react-dom";
-import { Provider } from "react-redux";
-import { createStore, applyMiddleware, combineReducers } from "redux";
-import thunk from "redux-thunk";
-import { createLogger } from "redux-logger";
-import { Router, Route, IndexRoute, browserHistory } from "react-router";
+import React from 'react';
+import {render} from 'react-dom';
+import {Provider} from 'react-redux';
+import {createStore, applyMiddleware, combineReducers} from 'redux';
+import thunk from 'redux-thunk';
+import {createLogger} from 'redux-logger';
+import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import {
   syncHistoryWithStore,
   routerReducer,
-  routerMiddleware
-} from "react-router-redux";
-import throttle from "lodash/throttle";
-import appReducer from "./ducks";
-import { loginPersistedUser } from "./ducks/auth";
-import AppContainer from "./containers/AppContainer";
-import { loadState, saveState, requireAuthentication } from "./utils";
-import HomeContainer from "./containers/HomeContainer";
-import ProcessorsContainer from "./containers/ProcessorsContainer";
-import ProcessorDetailsContainer from "./containers/ProcessorDetailsContainer";
-import NotificationContainer from "./containers/NotificationContainer";
-import NotificationDetailsContainer from "./containers/NotificationDetailsContainer";
-import InputContainer from "./containers/InputContainer";
-import InputDetailsContainer from "./containers/InputDetailsContainer";
-import TestContainer from "./containers/TestContainer";
+  routerMiddleware,
+} from 'react-router-redux';
+import throttle from 'lodash/throttle';
+import appReducer from './ducks';
+import {loginPersistedUser} from './ducks/auth';
+import AppContainer from './containers/AppContainer';
+import {loadState, saveState, requireAuthentication} from './utils';
+import HomeContainer from './containers/HomeContainer';
+import ProcessorsContainer from './containers/ProcessorsContainer';
+import ProcessorDetailsContainer from './containers/ProcessorDetailsContainer';
+import NotificationContainer from './containers/NotificationContainer';
+import NotificationDetailsContainer from './containers/NotificationDetailsContainer';
+import InputContainer from './containers/InputContainer';
+import InputDetailsContainer from './containers/InputDetailsContainer';
+import TestContainer from './containers/TestContainer';
+import SignInContainer from './containers/SignInContainer';
 
-import "./style/Globals.less";
+import './style/Globals.less';
 
 // combine all the reducers into a single reducing function
 const rootReducer = combineReducers({
   sc: appReducer,
-  routing: routerReducer
+  routing: routerReducer,
 });
 
 // create the redux store that holds the state for this app
@@ -37,7 +38,7 @@ const rootReducer = combineReducers({
 const middleware = routerMiddleware(browserHistory);
 const store = createStore(
   rootReducer,
-  applyMiddleware(middleware, thunk, createLogger()) // logger must be the last in the chain
+  applyMiddleware(middleware, thunk, createLogger()), // logger must be the last in the chain
 );
 
 const persistedUser = loadState();
@@ -51,9 +52,9 @@ store.subscribe(
   throttle(() => {
     saveState({
       user: store.getState().sc.auth.user,
-      token: store.getState().sc.auth.token
+      token: store.getState().sc.auth.token,
     });
-  }, 1000)
+  }, 1000),
 );
 
 // create an enhanced history that syncs navigation events with the store
@@ -67,11 +68,12 @@ render(
     <Router history={history}>
       <Route path="/" name="Home" component={AppContainer}>
         <IndexRoute component={HomeContainer} />
+        <Route path="/login" name={requireAuthentication(SignInContainer)} />
+        <Route path="/signup" name={requireAuthentication(SignUpContainer)} />
         <Route
           path="/processors"
           name="Processors"
-          component={requireAuthentication(ProcessorsContainer)}
-        >
+          component={requireAuthentication(ProcessorsContainer)}>
           <Route
             path="/processors/:id"
             staticName
@@ -81,8 +83,7 @@ render(
         <Route
           path="/notifications"
           name="Notifications"
-          component={requireAuthentication(NotificationContainer)}
-        >
+          component={requireAuthentication(NotificationContainer)}>
           <Route
             path="/notifications/:id"
             staticName
@@ -92,8 +93,7 @@ render(
         <Route
           path="/inputs"
           name="Inputs"
-          component={requireAuthentication(InputContainer)}
-        >
+          component={requireAuthentication(InputContainer)}>
           <Route
             path="/inputs/:id"
             staticName
@@ -108,5 +108,5 @@ render(
       </Route>
     </Router>
   </Provider>,
-  document.getElementById("root")
+  document.getElementById('root'),
 );
