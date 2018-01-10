@@ -50,8 +50,11 @@ export function addInput(i) {
 
 export function updateInput(i) {
   return dispatch => {
+    const {sc} = getState();
+    const token = sc.auth.token;
     return request
       .put(`${API_URL}inputs/` + i.id)
+      .set('Authorization', `Token ${token}`)
       .send(i)
       .then(
         () => {
@@ -78,11 +81,15 @@ export function receiveInput(notification) {
 }
 
 export function loadInputs() {
-  return dispatch =>
+  return (dispatch, getState) => {
+    const {sc} = getState();
+    const token = sc.auth.token;
     request
       .get(`${API_URL}inputs`)
+      .set('Authorization', `Token ${token}`)
       .then(res => res.body.result)
       .then(data => dispatch(receiveInputs(data)));
+  };
 }
 
 export function loadInput(inputId) {
@@ -98,13 +105,18 @@ export function loadInput(inputId) {
 }
 
 export function deleteInput(input) {
-  return dispatch => {
-    return request.delete(`${API_URL}inputs/${input.id}`).then(() => {
-      dispatch({
-        type: DELETE_INPUT,
-        payload: {input},
+  return (dispatch, getState) => {
+    const {sc} = getState();
+    const token = sc.auth.token;
+    return request
+      .delete(`${API_URL}inputs/${input.id}`)
+      .set('Authorization', `Token ${token}`)
+      .then(() => {
+        dispatch({
+          type: DELETE_INPUT,
+          payload: {input},
+        });
+        dispatch(push('/inputs'));
       });
-      dispatch(push('/inputs'));
-    });
   };
 }

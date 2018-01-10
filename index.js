@@ -67,9 +67,8 @@ render(
   <Provider store={store}>
     <Router history={history}>
       <Route path="/" name="Home" component={AppContainer}>
-        <IndexRoute component={HomeContainer} />
-        <Route path="/login" name={requireAuthentication(SignInContainer)} />
-        <Route path="/signup" name={requireAuthentication(SignUpContainer)} />
+        <IndexRoute component={requireAuthentication(HomeContainer)} />
+        <Route path="/login" name={SignInContainer} />
         <Route
           path="/processors"
           name="Processors"

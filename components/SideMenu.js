@@ -1,7 +1,7 @@
-import React, { PropTypes } from "react";
-import { Link } from "react-router";
+import React, {PropTypes} from 'react';
+import {Link} from 'react-router';
 
-const SideMenuItem = ({ path, name, onClick }) => (
+const SideMenuItem = ({path, name, onClick}) => (
   <div className="side-menu-item">
     <Link to={path} activeClassName="active" onClick={onClick}>
       {name}
@@ -12,26 +12,26 @@ const SideMenuItem = ({ path, name, onClick }) => (
 SideMenuItem.propTypes = {
   path: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 };
 
-const SideMenu = ({ isAuthenticated, closeMenu, menuOpen }) => (
-  <div className={`side-menu ${menuOpen ? "open" : "closed"}`}>
+const SideMenu = ({isAuthenticated, closeMenu, menuOpen}) => (
+  <div className={`side-menu ${menuOpen ? 'open' : 'closed'}`}>
     {isAuthenticated ? (
       <nav>
         <SideMenuItem
-          path={"/processors"}
-          name={"Processors"}
+          path={'/processors'}
+          name={'Processors'}
           onClick={closeMenu}
         />
         <div className="side-menu-separator" />
         <SideMenuItem
-          path={"/notifications"}
-          name={"Notifications"}
+          path={'/notifications'}
+          name={'Notifications'}
           onClick={closeMenu}
         />
         <div className="side-menu-separator" />
-        <SideMenuItem path={"/inputs"} name={"Input"} onClick={closeMenu} />
+        <SideMenuItem path={'/inputs'} name={'Input'} onClick={closeMenu} />
         <div className="side-menu-separator" />
         {/* <SideMenuItem path={"/test"} name={"Test"} onClick={closeMenu} /> */}
         <div className="side-menu-item bottom">
@@ -40,8 +40,7 @@ const SideMenu = ({ isAuthenticated, closeMenu, menuOpen }) => (
       </nav>
     ) : (
       <nav>
-        <SideMenuItem path={"/login"} name={"Sign In"} onClick={closeMenu} />
-        <SideMenuItem path={"/signup"} name={"Sign Up"} onClick={closeMenu} />
+        <SideMenuItem path={'/login'} name={'Sign In'} onClick={closeMenu} />
       </nav>
     )}
   </div>
@@ -50,7 +49,7 @@ const SideMenu = ({ isAuthenticated, closeMenu, menuOpen }) => (
 SideMenu.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   closeMenu: PropTypes.func.isRequired,
-  menuOpen: PropTypes.bool.isRequired
+  menuOpen: PropTypes.bool.isRequired,
 };
 
 export default SideMenu;
