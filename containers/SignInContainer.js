@@ -25,7 +25,7 @@ export default connect(
     isAuthenticating: state.sc.auth.isAuthenticating,
     statusText: state.sc.auth.statusText,
   }),
-  dispatch => {
-    actions: bindActionCreators(authActions, dispatch);
-  },
-);
+  dispatch => ({
+    actions: bindActionCreators(authActions, dispatch),
+  }),
+)(SignInContainer);

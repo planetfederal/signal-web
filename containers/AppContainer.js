@@ -6,6 +6,7 @@ import SideMenu from '../components/SideMenu';
 import * as authActions from '../ducks/auth';
 import * as menuActions from '../ducks/menu';
 import '../style/App.less';
+import * as R from 'ramda';
 
 const getWindowWidth = () => {
   const w = window;
@@ -57,7 +58,11 @@ class AppContainer extends Component {
   render() {
     return (
       <div id="app">
-        <Header {...this.props} toggleMenu={this.toggleMenu} />
+        <Header
+          {...this.props}
+          logout={this.props.actions.logout}
+          toggleMenu={this.toggleMenu}
+        />
         <div className="main-container">
           <SideMenu
             {...this.props}
@@ -79,7 +84,7 @@ AppContainer.propTypes = {
 
 const mapStateToProps = (state, ownProps) => ({
   isAuthenticated: state.sc.auth.isAuthenticated,
-  userName: state.sc.auth.user.name,
+  userName: R.pathOr('N/A', ['sc', 'auth', 'user', 'name'], state),
   id: ownProps.params.id,
   menu: state.sc.menu,
 });

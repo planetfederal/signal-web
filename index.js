@@ -68,7 +68,7 @@ render(
     <Router history={history}>
       <Route path="/" name="Home" component={AppContainer}>
         <IndexRoute component={requireAuthentication(HomeContainer)} />
-        <Route path="/login" name={SignInContainer} />
+        <Route path="/login" name="Login" component={SignInContainer} />
         <Route
           path="/processors"
           name="Processors"
