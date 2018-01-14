@@ -78,8 +78,11 @@ export function updateProcessorErrors(errors) {
 
 export function updateProcessor(processor) {
   return (dispatch, getState) => {
+    const {sc} = getState();
+    const token = sc.auth.token;
     return request
       .put(`${API_URL}processors/${processor.id}`)
+      .set('Authorization', `Token ${token}`)
       .send(processor)
       .then(
         () => dispatch(loadProcessor(processor.id, true)),

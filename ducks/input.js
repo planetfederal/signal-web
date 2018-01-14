@@ -49,7 +49,7 @@ export function addInput(i) {
 }
 
 export function updateInput(i) {
-  return dispatch => {
+  return (dispatch, getState) => {
     const {sc} = getState();
     const token = sc.auth.token;
     return request
