@@ -33,6 +33,7 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 
+
 export function addInput(i) {
   return (dispatch, getState) => {
     const {sc} = getState();

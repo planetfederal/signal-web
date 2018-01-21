@@ -10,6 +10,7 @@ export const UPDATE_PROCESSOR = 'sc/processors/UPDATE_PROCESSOR';
 export const DELETE_PROCESSOR = 'sc/processors/DELETE_PROCESSOR';
 export const PROCESSOR_ERRORS = 'sc/processors/PROCESSOR_ERRORS';
 export const LOAD_CAPABILITIES = 'sc/capabilities/LOAD_CAPABILITIES';
+export const POINT_SENT_ERRORS = 'sc/test/POINT_SENT_ERRORS';
 
 export const initialState = {
   spatial_processors: {},
@@ -62,6 +63,11 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         errors: action.payload.errors,
       };
+    case POINT_SENT_ERRORS:
+      return {
+        ...state,
+        errors: action.payload.errors
+      };
     default:
       return state;
   }
@@ -74,6 +80,29 @@ export function updateProcessorErrors(errors) {
       errors,
     },
   };
+}
+
+export function updateCheck(errors) {
+  return {
+    type: POINT_SENT_ERRORS,
+    payload : {
+      errors
+    },
+  };
+}
+
+export function testPoint(p) {
+  return (dispatch,getState) => {
+    const token = getState().sc.auth.token;
+    return request
+      .post(`${API_URL}check`)
+      .set('Authorization', `Token ${token}`)
+      .send(p)
+      .then(
+        () => dispatch({}),
+        err => dispatch(updateCheck(err.body.error))
+      );
+  }
 }
 
 export function updateProcessor(processor) {

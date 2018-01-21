@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import * as processorActions from "../ducks/processors";
 import Home from "../components/Home";
 import "../style/Processors.less";
+import * as R from 'ramda';
 
 const format = new ol.format.GeoJSON();
 
@@ -32,9 +33,10 @@ class TestContainer extends Component {
     super(props);
     this.state = {
       val: "",
-      submitting: false
+      coords:[0,0]
     };
 
+    this.updateCoords = this.updateCoords.bind(this);
     this.toggleSubmit = this.toggleSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
   }
@@ -42,7 +44,6 @@ class TestContainer extends Component {
   componentDidMount() {
     this.createMap();
     window.addEventListener("resize", () => {
-      console.log("cdm");
       this.createMap();
     });
   }
@@ -68,37 +69,38 @@ class TestContainer extends Component {
     this.setState({ submitting });
   }
 
+  updateCoords(evt) {
+    const coords = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+    this.setState({coords})
+    this.props.actions.testPoint({
+      type:"Feature",
+      geometry: {
+        type: "Point",
+        coordinates: coords
+      },
+      id: "test-point",
+      properties:{}
+    });
+    setTimeout(() => this.setState({coords:[0,0]}),3000)
+  }
+
   createMap() {
     while (this.mapRef.firstChild) {
       this.mapRef.removeChild(this.mapRef.firstChild);
     }
-    this.newSubmissionSource = new ol.source.Vector();
-    const newPredicateLayer = new ol.layer.Vector({
-      source: this.newSubmissionSource,
-      style: newPredicateStyle
-    });
-    this.select = new ol.interaction.Select({
-      wrapX: false,
-      style: newPredicateStyle
-    });
-    this.create = new ol.interaction.Draw({
-      source: this.newSubmissionSource,
-      type: "Point"
-    });
     this.map = new ol.Map({
       target: this.mapRef,
-      interactions: ol.interaction.defaults().extend([this.select]),
       layers: [
         new ol.layer.Tile({
           source: new ol.source.OSM()
-        }),
-        newPredicateLayer
+        })
       ],
       view: new ol.View({
         center: ol.proj.fromLonLat([-100, 30]),
         zoom: 3
       })
     });
+    this.map.on('click',this.updateCoords);
   }
 
   render() {
@@ -108,7 +110,11 @@ class TestContainer extends Component {
           <div className="processor-details">
             <div className="processor-props">
               <label htmlFor="recipients">Test</label>
-              <p>Click to send test point</p>
+              <p>
+              {this.state.coords[0] !== 0 ?
+                'Sending:' + this.state.coords :
+                'Click to send test point'
+              }</p>
             </div>
             <div
               className="processor-map"
@@ -116,11 +122,6 @@ class TestContainer extends Component {
                 this.mapRef = c;
               }}
             />
-            <div className="btn-toolbar">
-              <button className="btn btn-sc" onClick={this.toggleSubmit}>
-                {!this.state.submitting ? "Enable" : "Cancel"}
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -129,7 +130,7 @@ class TestContainer extends Component {
 }
 
 TestContainer.propTypes = {
-  processorActions: PropTypes.object.isRequired
+  actions: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -137,7 +138,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  processorActions: bindActionCreators(processorActions, dispatch)
+  actions: bindActionCreators(processorActions, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TestContainer);
