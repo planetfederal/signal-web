@@ -3,14 +3,7 @@ import keyBy from 'lodash/keyBy';
 import omit from 'lodash/omit';
 import {push} from 'react-router-redux';
 import {API_URL} from 'config';
-
-export const LOAD_SPATIAL_PROCESSORS = 'sc/processors/LOAD_SPATIAL_PROCESSORS';
-export const ADD_PROCESSOR = 'sc/processors/ADD_PROCESSOR';
-export const UPDATE_PROCESSOR = 'sc/processors/UPDATE_PROCESSOR';
-export const DELETE_PROCESSOR = 'sc/processors/DELETE_PROCESSOR';
-export const PROCESSOR_ERRORS = 'sc/processors/PROCESSOR_ERRORS';
-export const LOAD_CAPABILITIES = 'sc/capabilities/LOAD_CAPABILITIES';
-export const POINT_SENT_ERRORS = 'sc/test/POINT_SENT_ERRORS';
+import * as Types from './types';
 
 export const initialState = {
   spatial_processors: {},

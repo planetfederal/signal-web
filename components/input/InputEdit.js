@@ -50,7 +50,7 @@ export class InputEdit extends Component {
     return (
       <div className="side-form">
         <div className="form-group">
-          <label htmlFor="input-name">Name:</label>
+          <label htmlFor="input-name">Name</label>
           <input
             id="input-name"
             type="text"
@@ -60,7 +60,7 @@ export class InputEdit extends Component {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="input-desc">Description:</label>
+          <label htmlFor="input-desc">Description</label>
           <input
             id="input-desc"
             type="text"
@@ -80,10 +80,13 @@ export class InputEdit extends Component {
             <option key="http" value="http">
               http
             </option>
+            <option key="mqtt" value="http">
+              mqtt
+            </option>
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="input-http-interval">Interval:</label>
+          <label htmlFor="input-http-interval">Interval</label>
           <input
             id="input-http-interval"
             type="text"
@@ -98,7 +101,7 @@ export class InputEdit extends Component {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="input-http-url">Url (GET):</label>
+          <label htmlFor="input-http-url">Url (GET)</label>
           <input
             id="input-http-url"
             type="text"
