@@ -18,7 +18,7 @@ module.exports = {
     contentBase: './public',
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:8085',
         secure: false,
       },
     },

@@ -5,7 +5,7 @@
   "scripts": {
     "test": "NODE_ENV=local jest",
     "test:watch": "npm test -- --watch",
-    "start:local": "NODE_ENV=local webpack-dev-server --progress --inline --config webpack.local.js",
+    "start:local": "NODE_ENV=local webpack-dev-server --port 8090 --progress --inline --config webpack.local.js",
     "build:local": "NODE_ENV=local webpack --config webpack.local.js",
     "build:dev": "NODE_ENV=development webpack",
     "build:cf": "NODE_ENV=cf webpack",
@@ -52,6 +52,7 @@
     "react-redux": "^4.4.5",
     "react-router": "^2.4.0",
     "react-router-redux": "^4.0.4",
+    "rebuild": "0.1.2",
     "redux": "^3.5.2",
     "redux-auth-wrapper": "0.5.2",
     "redux-logger": "*",
