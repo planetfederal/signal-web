@@ -3,7 +3,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import find from "lodash/find";
 import NotificationView from "../components/notification/NotificationView";
-import * as notificationActions from "../ducks/notifications";
+import * as notificationActions from "../reducers/notifications";
 import NotificationList from "../components/notification/NotificationList";
 
 class NotificationContainer extends Component {

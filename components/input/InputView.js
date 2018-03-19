@@ -1,13 +1,13 @@
-import React, {Component, PropTypes} from 'react';
-import './../../style/Processors.less';
-import HttpView from './HttpView';
-import InputEdit from './InputEdit';
+import React, { Component, PropTypes } from "react";
+import "./../../style/Processors.less";
+import HttpView from "./http/HttpView";
+import InputEdit from "./InputEdit";
 
 class InputView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      editingView: false,
+      editingView: false
     };
     this.onDelete = this.onDelete.bind(this);
     this.onEdit = this.onEdit.bind(this);
@@ -15,7 +15,7 @@ class InputView extends Component {
   }
 
   onEdit() {
-    this.setState({editingView: true});
+    this.setState({ editingView: true });
   }
 
   onDelete() {
@@ -27,7 +27,7 @@ class InputView extends Component {
   }
 
   render() {
-    const {input} = this.props;
+    const { input } = this.props;
     if (this.state.editingView) {
       return (
         <div className="wrapper">
@@ -56,7 +56,7 @@ class InputView extends Component {
 }
 
 InputView.propTypes = {
-  input: PropTypes.object.isRequired,
+  input: PropTypes.object.isRequired
 };
 
 export default InputView;

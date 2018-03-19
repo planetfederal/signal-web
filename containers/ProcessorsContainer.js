@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import * as processorActions from "../ducks/processors";
+import * as processorActions from "../reducers/processors";
 import ProcessorEdit from "../components/processor/ProcessorEdit";
 import ProcessorList from "../components/processor/ProcessorList";
 import uuidv4 from "uuid/v4";

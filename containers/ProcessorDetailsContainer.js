@@ -3,7 +3,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import find from "lodash/find";
 import ProcessorView from "../components/processor/ProcessorView";
-import * as processorActions from "../ducks/processors";
+import * as processorActions from "../reducers/processors";
 
 class ProcessorDetailsContainer extends Component {
   componentDidMount() {

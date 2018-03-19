@@ -3,7 +3,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import find from "lodash/find";
 import InputView from "../components/input/InputView";
-import * as inputActions from "../ducks/input";
+import * as inputActions from "../reducers/input";
 import InputList from "../components/input/InputList";
 import InputEdit from "../components/input/InputEdit";
 

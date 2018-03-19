@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import * as processorActions from "../ducks/processors";
+import * as processorActions from "../reducers/processors";
 import Home from "../components/Home";
 import "../style/Processors.less";
-import * as R from 'ramda';
+import * as R from "ramda";
 
 const format = new ol.format.GeoJSON();
 
@@ -33,7 +33,7 @@ class TestContainer extends Component {
     super(props);
     this.state = {
       val: "",
-      coords:[0,0]
+      coords: [0, 0]
     };
 
     this.updateCoords = this.updateCoords.bind(this);
@@ -70,18 +70,18 @@ class TestContainer extends Component {
   }
 
   updateCoords(evt) {
-    const coords = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-    this.setState({coords})
+    const coords = ol.proj.transform(evt.coordinate, "EPSG:3857", "EPSG:4326");
+    this.setState({ coords });
     this.props.actions.testPoint({
-      type:"Feature",
+      type: "Feature",
       geometry: {
         type: "Point",
         coordinates: coords
       },
       id: "test-point",
-      properties:{}
+      properties: {}
     });
-    setTimeout(() => this.setState({coords:[0,0]}),3000)
+    setTimeout(() => this.setState({ coords: [0, 0] }), 3000);
   }
 
   createMap() {
@@ -100,7 +100,7 @@ class TestContainer extends Component {
         zoom: 3
       })
     });
-    this.map.on('click',this.updateCoords);
+    this.map.on("click", this.updateCoords);
   }
 
   render() {
@@ -111,10 +111,10 @@ class TestContainer extends Component {
             <div className="processor-props">
               <label htmlFor="recipients">Test</label>
               <p>
-              {this.state.coords[0] !== 0 ?
-                'Sending:' + this.state.coords :
-                'Click to send test point'
-              }</p>
+                {this.state.coords[0] !== 0
+                  ? "Sending:" + this.state.coords
+                  : "Click to send test point"}
+              </p>
             </div>
             <div
               className="processor-map"
