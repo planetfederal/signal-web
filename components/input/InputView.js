@@ -1,7 +1,8 @@
-import React, { Component, PropTypes } from "react";
-import "./../../style/Processors.less";
-import HttpView from "./http/HttpView";
-import InputEdit from "./InputEdit";
+import React, { Component, PropTypes } from 'react';
+import './../../style/Processors.less';
+import HttpView from './http/HttpView';
+import MqttView from './mqtt/MQTTView';
+import InputEdit from './InputEdit';
 
 class InputView extends Component {
   constructor(props) {
@@ -40,7 +41,11 @@ class InputView extends Component {
     return (
       <div className="processor-details">
         <div className="processor-props">
-          <HttpView input={input} />
+          {input.type === 'mqtt' ? (
+            <MqttView input={input} />
+          ) : (
+            <HttpView input={input} />
+          )}
           <div className="btn-toolbar">
             <button className="btn btn-sc" onClick={this.onEdit}>
               Edit Input

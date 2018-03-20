@@ -9,7 +9,8 @@ const Home = ({ spatial_processors }) => (
         <div className="form-item">
           <div className="properties">
             <PropertyListItem
-              name={'Spatial Processors'} value={Object.keys(spatial_processors).length}
+              name={'Spatial Processors'}
+              value={Object.keys(spatial_processors).length}
             />
           </div>
         </div>
@@ -19,7 +20,7 @@ const Home = ({ spatial_processors }) => (
 );
 
 Home.propTypes = {
-  spatial_processors: PropTypes.object.isRequired,
+  spatial_processors: PropTypes.object.isRequired
 };
 
 export default Home;
