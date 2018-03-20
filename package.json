@@ -1,6 +1,6 @@
 {
   "name": "signal-server-dashboard",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Dashboard for signal",
   "scripts": {
     "test": "NODE_ENV=local jest",
