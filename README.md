@@ -1,6 +1,6 @@
 # Signal Web
 
-### Version 1.0.7
+### Version 1.0.8
 
 The signal Dashboard is a web application that allows users to configure
 events, data stores, notifications, users, and other properties of
