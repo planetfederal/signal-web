@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from "react";
 import without from "lodash/without";
 import { isEmail } from "../../utils";
-import WebhookEdit from "./../output/WebhookEdit";
-import EmailEdit from "./../output/EmailEdit";
+import HttpEdit from "./http/HttpEdit";
+import MQTTEdit from "./mqtt/MQTTEdit";
 import * as R from "ramda";
 
 export const validate = values => {
@@ -80,36 +80,16 @@ export class InputEdit extends Component {
             <option key="http" value="http">
               http
             </option>
-            <option key="mqtt" value="http">
+            <option key="mqtt" value="mqtt">
               mqtt
             </option>
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="input-http-interval">Interval</label>
-          <input
-            id="input-http-interval"
-            type="text"
-            className="form-control"
-            onChange={e =>
-              this.onStateChange(
-                ["definition", "interval"],
-                R.assocPath(["target", "value"], parseInt(e.target.value), e)
-              )
-            }
-            value={this.state.definition.interval}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="input-http-url">Url (GET)</label>
-          <input
-            id="input-http-url"
-            type="text"
-            className="form-control"
-            onChange={R.partial(this.onStateChange, [["definition", "url"]])}
-            value={this.state.definition.url}
-          />
-        </div>
+        {this.state.type === "http" ? 
+          <HttpEdit definition={this.state.definition} stateChange={this.onStateChange}></HttpEdit> : 
+          <MQTTEdit definition={this.state.definition} stateChange={this.onStateChange}></MQTTEdit>
+        }
         <div className="btn-toolbar">
           <button className="btn btn-sc" onClick={this.save}>
             Save
@@ -119,10 +99,9 @@ export class InputEdit extends Component {
           </button>
         </div>
       </div>
+      </div>
     );
   }
 }
-
-InputEdit.propTypes = {};
 
 export default InputEdit;

@@ -31,8 +31,4 @@ const HttpEdit = ({ definition, stateChange }) => (
   </div>
 );
 
-HttpEdit.propTypes = {
-  input: PropTypes.object.isRequired
-};
-
 export default HttpEdit;

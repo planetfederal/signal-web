@@ -68,7 +68,7 @@ export default function reducer(state = initialState, action = {}) {
 
 export function updateProcessorErrors(errors) {
   return {
-    type: PROCESSOR_ERRORS,
+    type: Types.PROCESSOR_ERRORS,
     payload: {
       errors
     }
@@ -77,7 +77,7 @@ export function updateProcessorErrors(errors) {
 
 export function updateCheck(errors) {
   return {
-    type: POINT_SENT_ERRORS,
+    type: Types.POINT_SENT_ERRORS,
     payload: {
       errors
     }
@@ -127,7 +127,7 @@ export function addProcessor(processor) {
 
 export function receiveProcessors(processors) {
   return {
-    type: LOAD_SPATIAL_PROCESSORS,
+    type: Types.LOAD_SPATIAL_PROCESSORS,
     payload: {
       spatial_processors: keyBy(processors, "id")
     }
@@ -136,7 +136,7 @@ export function receiveProcessors(processors) {
 
 export function receiveProcessor(processor) {
   return {
-    type: ADD_PROCESSOR,
+    type: Types.ADD_PROCESSOR,
     payload: { processor }
   };
 }
@@ -150,7 +150,7 @@ export function deleteProcessor(processor) {
       .set("Authorization", `Token ${token}`)
       .then(() => {
         dispatch({
-          type: DELETE_PROCESSOR,
+          type: Types.DELETE_PROCESSOR,
           payload: { processor }
         });
         dispatch(push("/processors"));
@@ -184,7 +184,7 @@ export function loadProcessors() {
 
 function receiveCapabilities(capabilities) {
   return {
-    type: LOAD_CAPABILITIES,
+    type: Types.LOAD_CAPABILITIES,
     payload: {
       capabilities
     }

@@ -10,8 +10,7 @@ export const SIGNUP_USER_REQUEST = 'sc/auth/SIGNUP_USER_REQUEST';
 export const SIGNUP_USER_FAILURE = 'sc/auth/SIGNUP_USER_FAILURE';
 export const SIGNUP_USER_SUCCESS = 'sc/auth/SIGNUP_USER_SUCCESS';
 export const LOGOUT_USER = 'sc/auth/LOGOUT_USER';
-export const FETCH_PROTECTED_DATA_REQUEST =
-  'sc/auth/FETCH_PROTECTED_DATA_REQUEST';
+export const FETCH_PROTECTED_DATA_REQUEST = 'sc/auth/FETCH_PROTECTED_DATA_REQUEST';
 export const RECEIVE_PROTECTED_DATA = 'sc/auth/RECEIVE_PROTECTED_DATA';
 
 const initialState = {

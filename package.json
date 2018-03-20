@@ -5,7 +5,7 @@
   "scripts": {
     "test": "NODE_ENV=local jest",
     "test:watch": "npm test -- --watch",
-    "start:local": "NODE_ENV=local webpack-dev-server --port 8090 --progress --inline --config webpack.local.js",
+    "start:local": "NODE_ENV=local webpack-dev-server --port 8084 --progress --inline --config webpack.local.js",
     "build:local": "NODE_ENV=local webpack --config webpack.local.js",
     "build:dev": "NODE_ENV=development webpack",
     "build:cf": "NODE_ENV=cf webpack",
